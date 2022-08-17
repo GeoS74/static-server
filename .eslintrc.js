@@ -1,27 +1,3 @@
-// {
-//     "env": {
-//         "browser": true,
-//         "commonjs": true,
-//         "es2021": true
-//     },
-//     "extends": [
-//         "airbnb-base",
-//         "plugin:@typescript-eslint/recommended"
-//     ],
-//     "overrides": [
-//     ],
-//     "parser": "@typescript-eslint/parser",
-//     "parserOptions": {
-//         "ecmaVersion": "latest",
-//         "sourceType": "module"
-//     },
-//     "plugins": [
-//         "@typescript-eslint"
-//     ],
-//     "rules": {
-//     }
-// }
-
 module.exports = {
   env: {
     browser: true,
@@ -46,6 +22,7 @@ module.exports = {
     'no-restricted-syntax': 'off',
     'no-await-in-loop': 'off',
     'no-param-reassign': 'off',
+    'import/prefer-default-export': 'off',
   },
   plugins: ['@typescript-eslint'],
   ignorePatterns: ['*.js', '/client/*'],
