@@ -22,7 +22,7 @@ server.on('request', async (request: http.IncomingMessage, response: http.Server
 
       response.end(html);
     }
-  } catch (error: unknown) {
+  } catch (error) {
     if (error instanceof Error) {
       console.log(error.message);
     }
@@ -35,10 +35,8 @@ server.on('request', async (request: http.IncomingMessage, response: http.Server
 server.listen(3500, (): void => console.log('server run at 3500 port'));
 
 function _readFile(fname: string): Promise<string | void> {
-  const filePath: string = path.join(__dirname, `../../wiki/${fname}`);
-
   return new Promise((resolve: (value: string) => void, reject: (error: NodeJS.ErrnoException) => void): void => {
-    fs.readFile(filePath, (error: NodeJS.ErrnoException | null, buff: Buffer) => {
+    fs.readFile(_getFilePath(fname), (error: NodeJS.ErrnoException | null, buff: Buffer) => {
       if (error) {
         reject(error);
         return;
@@ -50,6 +48,10 @@ function _readFile(fname: string): Promise<string | void> {
     .catch((error: NodeJS.ErrnoException): void => {
       throw error;
     });
+}
+
+function _getFilePath(fname: string): string {
+ return path.join(__dirname, `../../../wiki/${fname}`); 
 }
 
 function _getFileName(path: string): string {

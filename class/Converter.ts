@@ -8,20 +8,30 @@ export class Converter {
     };
 
   markdownToHTML(markdown: string): string {
-    const blocks: string[] = this.parse(markdown);
-    this.addTagsHTML(blocks);
-
-    console.log(blocks);
-
-    return this.getHTML(blocks);
-  }
-
-  private addTagsHTML(blocks: string[]): void {
-    for (const k in blocks) {
-      blocks[k] = this.title(blocks[k]);
-      blocks[k] = this.bold(blocks[k]);
+    const html: string[] = [];
+    for(const block in this.textNewLine(markdown, '\n', 1)){
+      for(const line of this.textNewLine(block, '\n', 1)){
+        console.log(line);
+      }
     }
+
+    return html.join('');
+
+    // const blocks: string[] = this.textNewLine(markdown, '\n', 2);
+    // this.addTagsHTML(blocks);
+
+    // console.log(blocks);
+
+    // return this.getHTML(blocks);
   }
+
+  // private addTagsHTML(blocks: string[]): void {
+  //   for (const k in blocks) {
+  //     blocks[k] = this.title(blocks[k]);
+  //     // blocks[k] = this.bold(blocks[k]);
+  //     break;
+  //   }
+  // }
 
   private bold(block: string): string {
     const matched: RegExpMatchArray = block.match(this.regexp.bold) || [];
@@ -35,21 +45,23 @@ export class Converter {
   }
 
   private title(block: string): string {
-    const matched: RegExpMatchArray = block.match(this.regexp.title) || [];
+    const matched = block.match(this.regexp.title) || [];
 
-    if (!matched?.input) {
-      return block;
-    }
+    // if (!matched?.input) {
+    //   return block;
+    // }
 
-    const str: string = matched.input.slice(matched[0].length);
-    return `<h${matched[0].length - 1}>${str}</h${matched[0].length - 1}>`;
+    // console.log(this.textNewLine(block, 1))
+    return '';
+    // const str: string = matched.input.slice(matched[0].length);
+    // return `<h${matched[0].length - 1}>${str}</h${matched[0].length - 1}>`;
   }
 
   private getHTML(blocks: string[]): string {
     return blocks.join('\n\n');
   }
 
-  private parse(markdown: string): string[] {
-    return markdown.split('\n\n');
+  private textNewLine(text: string, separator: string, countNewLine: number): string[] {
+    return text.split(new Array(countNewLine).fill(separator).join(''));
   }
 }
