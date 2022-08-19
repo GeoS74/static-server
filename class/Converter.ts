@@ -1,3 +1,5 @@
+// import * as os from 'os';
+
 export class Converter {
   regexp: {
     title: RegExp,
@@ -9,29 +11,23 @@ export class Converter {
 
   markdownToHTML(markdown: string): string {
     const html: string[] = [];
-    for(const block in this.textNewLine(markdown, '\n', 1)){
-      for(const line of this.textNewLine(block, '\n', 1)){
-        console.log(line);
+    
+    for(const block in markdown.split(`\n\n`)){
+      const divs: string[] = [];
+
+      for(const line of markdown.split(`\n`)){
+        divs.push(this.lineProcessing(line));
       }
+      html.push(divs.join('\n'));
     }
 
-    return html.join('');
-
-    // const blocks: string[] = this.textNewLine(markdown, '\n', 2);
-    // this.addTagsHTML(blocks);
-
-    // console.log(blocks);
-
-    // return this.getHTML(blocks);
+    return html.join('\n\n');
   }
 
-  // private addTagsHTML(blocks: string[]): void {
-  //   for (const k in blocks) {
-  //     blocks[k] = this.title(blocks[k]);
-  //     // blocks[k] = this.bold(blocks[k]);
-  //     break;
-  //   }
-  // }
+  private lineProcessing(line: string): string {
+    line = this.title(line);
+    return line;
+  }
 
   private bold(block: string): string {
     const matched: RegExpMatchArray = block.match(this.regexp.bold) || [];
@@ -44,24 +40,20 @@ export class Converter {
     return block;
   }
 
-  private title(block: string): string {
-    const matched = block.match(this.regexp.title) || [];
+  private title(line: string): string {
+    const matched: RegExpMatchArray = line.match(this.regexp.title) || [];
 
-    // if (!matched?.input) {
-    //   return block;
-    // }
-
-    // console.log(this.textNewLine(block, 1))
-    return '';
-    // const str: string = matched.input.slice(matched[0].length);
-    // return `<h${matched[0].length - 1}>${str}</h${matched[0].length - 1}>`;
+    if (!matched?.input) {
+      return line;
+    }
+    return line.replace(matched[0], `<h${matched[0].length-1}>`) + `</h${matched[0].length-1}>`;
   }
 
-  private getHTML(blocks: string[]): string {
-    return blocks.join('\n\n');
-  }
+  // private breakText(text: string, separator: string): string[] {
+  //   return text.split(separator);
+  // }
 
-  private textNewLine(text: string, separator: string, countNewLine: number): string[] {
-    return text.split(new Array(countNewLine).fill(separator).join(''));
-  }
+  // private glueText(text: string[], separator: string): string {
+  //   return text.join(separator);
+  // }
 }
