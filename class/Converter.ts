@@ -6,7 +6,7 @@ export class Converter {
     internalLink: RegExp,
     bold: RegExp,
   } = {
-      title: /#+\s/,
+      title: /^#+\s/,
       internalLink: /\[\[[^\[\]]+\]\]/g,
       bold: /__/,
     };
@@ -44,16 +44,10 @@ export class Converter {
     }
     
     for(const title of matched){
-      const newTitle = title[0].slice(2, -2);
-      const link = `<a href="/${newTitle}">${newTitle}</a>`;
+      const newTitle: string = title[0].slice(2, -2).replace(/[#\s]/g, '');
+      const link: string = `<a href="/${newTitle}">${newTitle}</a>`;
       line = line.replace(title[0], link);
-
-      console.log(line);
-    console.log(title[0]);
-    console.log(link);
     }
-
-     
 
     return line;
   }
@@ -70,12 +64,4 @@ export class Converter {
     }
     return line.replace(matched[0], `<h${matched[0].length-1}>`) + `</h${matched[0].length-1}>`;
   }
-
-  // private breakText(text: string, separator: string): string[] {
-  //   return text.split(separator);
-  // }
-
-  // private glueText(text: string[], separator: string): string {
-  //   return text.join(separator);
-  // }
 }
