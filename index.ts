@@ -20,6 +20,7 @@ server.on('request', async (request: http.IncomingMessage, response: http.Server
       const fname: string = _getFileName(url.pathname);
       const html = await _readFile(fname);
 
+      response.setHeader('content-type', 'text/html; charset=utf-8')
       response.end(html);
     }
   } catch (error) {

@@ -9,6 +9,7 @@ export class Converter implements IConverter {
       },
       internalLink: /\[\[[^\[\]]+\]\]/g,
       bold: /__/,
+      spaces: /\s+/,
     };
 
   markdownToHTML(markdown: string): string {
@@ -67,7 +68,8 @@ export class Converter implements IConverter {
       return line;
     }
 
-    matched[0] = matched[0].replace(' ', '');
-    return line.replace(/#+\s+/g, `<h${matched[0].length}>`) + `</h${matched[0].length}>`;
+    matched[0] = matched[0].replace(this.regexp.spaces, '');
+
+    return line.replace(this.regexp.title.tag, `<h${matched[0].length}>`) + `</h${matched[0].length}>`;
   }
 }
