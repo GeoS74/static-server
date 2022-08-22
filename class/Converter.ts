@@ -1,12 +1,12 @@
 // import * as os from 'os';
+import { IConverter } from "./IConverter";
 
-export class Converter {
-  regexp: {
-    title: RegExp,
-    internalLink: RegExp,
-    bold: RegExp,
-  } = {
-      title: /^#+\s/,
+export class Converter implements IConverter {
+  regexp = {
+      title: {
+        test: /^([-\d]\s+)?#+\s/,
+        tag: /#+\s+/
+      },
       internalLink: /\[\[[^\[\]]+\]\]/g,
       bold: /__/,
     };
@@ -57,11 +57,17 @@ export class Converter {
   }
 
   private title(line: string): string {
-    const matched: RegExpMatchArray = line.match(this.regexp.title) || [];
-
-    if (!matched.length) {
+    if (!this.regexp.title.test.test(line)) {
       return line;
     }
-    return line.replace(matched[0], `<h${matched[0].length-1}>`) + `</h${matched[0].length-1}>`;
+
+    const matched: RegExpMatchArray | null = line.match(this.regexp.title.tag);
+
+    if(!matched) {
+      return line;
+    }
+
+    matched[0] = matched[0].replace(' ', '');
+    return line.replace(/#+\s+/g, `<h${matched[0].length}>`) + `</h${matched[0].length}>`;
   }
 }
