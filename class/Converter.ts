@@ -45,7 +45,7 @@ export class Converter implements IConverter {
     }
     
     for(const title of matched){
-      const newTitle: string = title[0].slice(2, -2).replace(/[#\s]/g, '');
+      const newTitle: string = title[0].slice(2, -2).replace(/#/g, '').replace(/\s+/g, ' ').trim();
       const link: string = `<a href="/${newTitle}">${newTitle}</a>`;
       line = line.replace(title[0], link);
     }
