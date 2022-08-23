@@ -9,7 +9,6 @@ export class Converter implements IConverter {
       },
       internalLink: /\[\[[^\[\]]+\]\]/g,
       bold: /__/,
-      spaces: /\s+/,
     };
 
   markdownToHTML(markdown: string): string {
@@ -45,7 +44,11 @@ export class Converter implements IConverter {
     }
     
     for(const title of matched){
-      const newTitle: string = title[0].slice(2, -2).replace(/#/g, '').replace(/\s+/g, ' ').trim();
+      const newTitle: string = title[0]
+        .slice(2, -2)
+        .replace(/#/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
       const link: string = `<a href="/${newTitle}">${newTitle}</a>`;
       line = line.replace(title[0], link);
     }
@@ -68,7 +71,7 @@ export class Converter implements IConverter {
       return line;
     }
 
-    matched[0] = matched[0].replace(this.regexp.spaces, '');
+    matched[0] = matched[0].replace(/\s+/, '');
 
     return line.replace(this.regexp.title.tag, `<h${matched[0].length}>`) + `</h${matched[0].length}>`;
   }
