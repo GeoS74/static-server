@@ -8,6 +8,7 @@ export class Converter implements IConverter {
         tag: /#+\s+/
       },
       internalLink: /\[\[[^\[\]]+\]\]/g,
+      externalLink: /(\[.*\])(\(.*\))/g,
       bold: /__/,
     };
 
@@ -27,6 +28,7 @@ export class Converter implements IConverter {
 
   private lineProcessing(line: string): string {
     line = this.internalLink(line);
+    line = this.externalLink(line);
     line = this.title(line);
     return line;
   }
@@ -57,6 +59,28 @@ export class Converter implements IConverter {
   }
 
   private externalLink(line: string): string {
+    const iterator: IterableIterator<RegExpMatchArray> = line.matchAll(this.regexp.externalLink);
+    const matched: RegExpMatchArray[] = [...iterator];
+
+    if (!matched.length) {
+      return line;
+    }
+
+    for(const title of matched){
+      
+      const newTitle: string = title[1].slice(1, -1);
+      const url = new URL(title[2].slice(1, -1))
+      console.log(newTitle)
+      console.log(url)
+      // const newTitle: string = title[0]
+      //   .slice(2, -2)
+      //   .replace(/#/g, '')
+      //   .replace(/\s+/g, ' ')
+      //   .trim();
+      // const link: string = `<a href="/${newTitle}">${newTitle}</a>`;
+      // line = line.replace(title[0], link);
+    }
+
     return line;
   }
 
