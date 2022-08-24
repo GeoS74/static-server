@@ -4,9 +4,10 @@ import { IConverter } from "./IConverter";
 export class Converter implements IConverter {
   regexp = {
     title: /^([-]\s+|\s+)?(#+)\s+/,
-    internalLink: /\[\[.+?\]\]/g,
+    internalLink: /^\[\[.+?\]\]|[^!]\[\[.+?\]\]/g,
     externalLink: /(\[[^[]+?\])(\(.+?\))/g,
-    bold: /__.+?__/g,
+    bold: /[^_]*(__[^_]+?__)[^_]*/g,
+    cursive: /[^_]*(_[^_]+?_)[^_]*/g,
     longSpace: /\s+/g,
   };
 
@@ -17,20 +18,23 @@ export class Converter implements IConverter {
       const divs: string[] = [];
 
       for (const line of block.split(`\n`)) {
-        divs.push(this.lineProcessing(line));
+        divs.push(this.linePipe(line));
       }
       html.push(divs.join('\n'));
     }
     return html.join('\n\n');
   }
 
-  private lineProcessing(line: string): string {
+  // bold -> cursive
+  // image -> internalLink
+  private linePipe(line: string): string {
     line = line.replace(this.regexp.longSpace, ' ');
 
     line = this.internalLink(line);
     line = this.externalLink(line);
     line = this.title(line);
     line = this.bold(line);
+    line = this.cursive(line);
     return line;
   }
 
@@ -43,8 +47,24 @@ export class Converter implements IConverter {
     }
 
     for (const chunk of matched) {
-      const bold: string = chunk[0].slice(2, -2);
-      line = line.replace(chunk[0], `<b>${bold}</b>`);
+      const bold: string = chunk[1].slice(2, -2);
+      line = line.replace(chunk[1], `<b>${bold}</b>`);
+    }
+    return line;
+  }
+
+  private cursive(line: string): string {
+    const iterator: IterableIterator<RegExpMatchArray> = line.matchAll(this.regexp.cursive);
+    const matched: RegExpMatchArray[] = [...iterator];
+
+    if (!matched.length) {
+      return line;
+    }
+
+    for (const chunk of matched) {
+      console.log(chunk)
+      const cursive: string = chunk[1].slice(1, -1);
+      line = line.replace(chunk[1], `<i>${cursive}</i>`);
     }
     return line;
   }

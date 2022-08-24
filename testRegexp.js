@@ -1,12 +1,37 @@
 const regexp = {
   title: /^([-]\s+|\s+)?(#+)\s+/,
-  internalLink: /\[\[.+?\]\]/g,
+  internalLink: /^\[\[.+?\]\]|[^!]\[\[.+?\]\]/g,
   externalLink: /(\[[^[]+?\])(\(.+?\))/g,
-  bold: /__.+?__/g,
+  bold: /[^_]*(__[^_]+?__)[^_]*/g,
+  cursive: /[^_]*(_[^_]+?_)[^_]*/g,
   longSpace: /\s+/g,
 };
 
 let str, res;
+
+
+
+////////////////////////////////////////////////////cursive
+str = 'lorem _ipsum_ dolor _sit_ amet';
+res = [...str.matchAll(regexp.cursive)]
+// console.log(res);
+
+str = 'lorem __ipsum__ dolor _sit_ amet';
+res = [...str.matchAll(regexp.cursive)]
+// console.log(res);
+
+str = 'lorem _ips_um_ dolor sit amet';
+res = [...str.matchAll(regexp.cursive)]
+// console.log(res);
+
+str = '_lorem_  _ips_';
+res = [...str.matchAll(regexp.cursive)]
+// console.log(res);
+
+str = '_f_g_h_';
+res = [...str.matchAll(regexp.cursive)]
+// console.log(res); //bad
+
 
 ////////////////////////////////////////////////////bold
 str = 'lorem __ips _u__m__ dolor __sit__ amet';
@@ -19,7 +44,11 @@ res = [...str.matchAll(regexp.bold)]
 
 str = 'text__b__o_ld__ text';
 res = [...str.matchAll(regexp.bold)]
-console.log(res);
+// console.log(res);
+
+str = '___text___ font';
+res = [...str.matchAll(regexp.bold)]
+// console.log(res);
 
 
 ////////////////////////////////////////////////////titleTest
@@ -134,3 +163,11 @@ res = [...str.matchAll(regexp.internalLink)]
 str = '[[qw[[e]]rty]] and [[qw[[w]]rty]]';
 res = [...str.matchAll(regexp.internalLink)]
 // console.log(res); //bad
+
+str = '![[pic]] and [[link]]';
+res = [...str.matchAll(regexp.internalLink)]
+// console.log(res); 
+
+str = '[[link]] and ![[pic]]';
+res = [...str.matchAll(regexp.internalLink)]
+// console.log(res); 
