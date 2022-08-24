@@ -6,9 +6,23 @@ const regexp = {
   bold: /[^_]*(__[^_]+?__)[^_]*/g,
   cursive: /[^_]*(_[^_]+?_)[^_]*/g,
   longSpace: /\s+/g,
+  list: /-\s+?(.*)/g,
 };
 
 let str, res;
+
+
+////////////////////////////////////////////////////list
+str = `
+- first
+-  sec-ond
+-threa - d
+four
+- 
+d - space
+`;
+res = [...str.matchAll(regexp.list)]
+console.log(res);
 
 
 
@@ -19,7 +33,7 @@ res = [...str.matchAll(regexp.image)]
 
 str = '!![[hello]] and !![[world]] is my';
 res = [...str.matchAll(regexp.image)]
-console.log(res);
+// console.log(res);
 
 
 

@@ -10,6 +10,7 @@ export class Converter implements IConverter {
     bold: /[^_]*(__[^_]+?__)[^_]*/g,
     cursive: /[^_]*(_[^_]+?_)[^_]*/g,
     longSpace: /\s+/g,
+    list: /-\s+?(.*)/g,
   };
 
   markdownToHTML(markdown: string): string {
@@ -23,6 +24,7 @@ export class Converter implements IConverter {
           lines.push(this.linePipe(line));
         }
       }
+
       const div: string = lines.join('\n');
       if (div.length) {
         divs.push(this.divPipe(div));
@@ -32,7 +34,13 @@ export class Converter implements IConverter {
   }
 
   private divPipe(div: string): string {
+    div = this.list(div);
     return `<div>${div}</div>`;
+  }
+
+  private list(div: string): string {
+
+    return div;
   }
 
   // bold -> cursive
