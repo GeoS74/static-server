@@ -5,7 +5,7 @@ export class Converter implements IConverter {
   regexp = {
     title: /^([-]\s+|\s+)?(#+)\s+/,
     internalLink: /\[\[.+?\]\]/g,
-    externalLink: /\[[^[]+?\]\(.+?\)/g,
+    externalLink: /(\[[^[]+?\])(\(.+?\))/g,
     bold: /__/,
     longSpace: /\s+/g,
   };
@@ -27,8 +27,8 @@ export class Converter implements IConverter {
   private lineProcessing(line: string): string {
     line = line.replace(this.regexp.longSpace, ' ');
 
-    // line = this.internalLink(line);
-    // line = this.externalLink(line);
+    line = this.internalLink(line);
+    line = this.externalLink(line);
     line = this.title(line);
     return line;
   }
@@ -46,11 +46,11 @@ export class Converter implements IConverter {
     }
 
     for (const chunk of matched) {
-      const currLink: string = chunk[0]
+      const link: string[] = chunk[0]
         .slice(2, -2)
-        .replace(/#/g, '');
+        .replace(/#/g, '>')
+        .split('|');
 
-      const link: string[] = currLink.split('|');
       const url: string = link[0].trim();
       const alias: string = link.length > 1 ? link.slice(1).join('|').trim() : url;
 
@@ -63,24 +63,17 @@ export class Converter implements IConverter {
     const iterator: IterableIterator<RegExpMatchArray> = line.matchAll(this.regexp.externalLink);
     const matched: RegExpMatchArray[] = [...iterator];
 
-    console.log(matched)
+    if (!matched.length) {
+      return line;
+    }
 
-    // if (!matched.length) {
-    //   return line;
-    // }
+    for (const chunk of matched) {
+      const alias: string = chunk[1].slice(1, -1).trim();
+      const url: string | null = this.getUrl(chunk[2].slice(1, -1).trim());
 
-    // for (const chunk of matched) {
-
-    //   const url: string | null = this.getUrl(chunk[2].slice(1, -1).trim());
-    //   const alias: string = chunk[1].slice(1, -1).trim();
-
-    //   if (url) {
-    //     line = line.replace(chunk[0], `<a href="${url}">${alias}</a>`);
-    //   } else {
-    //     line = line.replace(chunk[0], `[${alias}]${chunk[2]}`);
-    //   }
-    // }
-
+      const newLink = url ? `<a href="${url}" target="blank">${alias}</a>` : `[${alias}]${chunk[2]}`;
+      line = line.replace(chunk[0], newLink);
+    }
     return line;
   }
 
@@ -90,7 +83,6 @@ export class Converter implements IConverter {
     if (!matched) {
       return line;
     }
-
     return line.replace(matched[0], `<h${matched[2].length}>`) + `</h${matched[2].length}>`;
   }
 

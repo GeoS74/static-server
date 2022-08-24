@@ -4,7 +4,7 @@ const regexp = {
     tag: /#+\s+/
   },
   internalLink: /\[\[.+?\]\]/g,
-  externalLink: /\[[^[]+?\]\(.+?\)/g,
+  externalLink: /(\[[^[]+?\])(\(.+?\))/g,
   bold: /__/,
   longSpace: /\s+/g,
 };
