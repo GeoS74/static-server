@@ -3,22 +3,23 @@ import { IConverter } from "./IConverter";
 
 export class Converter implements IConverter {
   regexp = {
-      title: {
-        test: /^([-\d]\s+)?#+\s/,
-        tag: /#+\s+/
-      },
-      internalLink: /\[\[[^\[\]]+\]\]/g,
-      externalLink: /(\[.*\])(\(.*\))/g,
-      bold: /__/,
-    };
+    title: {
+      test: /^([-\d]\s+)?#+\s/,
+      tag: /#+\s+/
+    },
+    internalLink: /\[\[[^\[\]]+\]\]/g,
+    externalLink: /(\[.*\])(\(.*\))/g,
+    bold: /__/,
+    longSpace: /\s+/g,
+  };
 
   markdownToHTML(markdown: string): string {
     const html: string[] = [];
 
-    for(const block of markdown.split(`\n\n`)){
+    for (const block of markdown.split(`\n\n`)) {
       const divs: string[] = [];
 
-      for(const line of block.split(`\n`)){
+      for (const line of block.split(`\n`)) {
         divs.push(this.lineProcessing(line));
       }
       html.push(divs.join('\n'));
@@ -44,15 +45,18 @@ export class Converter implements IConverter {
     if (!matched.length) {
       return line;
     }
-    
-    for(const title of matched){
-      const newTitle: string = title[0]
+
+    for (const chunk of matched) {
+      const currLink: string = chunk[0]
         .slice(2, -2)
-        .replace(/#/g, '')
-        .replace(/\s+/g, ' ')
-        .trim();
-      const link: string = `<a href="/${newTitle}">${newTitle}</a>`;
-      line = line.replace(title[0], link);
+        .replace(this.regexp.longSpace, ' ')
+        .replace(/#/g, '');
+
+      const link: string[] = currLink.split('|');
+      const url: string = link[0].trim();
+      const alias: string = link.length > 1 ? link.slice(1).join('|').trim() : url;
+
+      line = line.replace(chunk[0], `<a href="/${url}">${alias}</a>`);
     }
 
     return line;
@@ -66,8 +70,8 @@ export class Converter implements IConverter {
       return line;
     }
 
-    for(const title of matched){
-      
+    for (const title of matched) {
+
       const newTitle: string = title[1].slice(1, -1);
       const url = new URL(title[2].slice(1, -1))
       console.log(newTitle)
@@ -91,7 +95,7 @@ export class Converter implements IConverter {
 
     const matched: RegExpMatchArray | null = line.match(this.regexp.title.tag);
 
-    if(!matched) {
+    if (!matched) {
       return line;
     }
 
