@@ -4,11 +4,11 @@ import { IConverter } from "./IConverter";
 export class Converter implements IConverter {
   regexp = {
     title: {
-      test: /^([-\d]\s+)?#+\s/,
+      test: /^([-]\s+|\s+)?(#+)\s+/,
       tag: /#+\s+/
     },
-    internalLink: /\[\[[^\[\]]+\]\]/g,
-    externalLink: /(\[.*\])(\(.*\))/g,
+    internalLink: /\[\[.+?\]\]/g,
+    externalLink: /\[[^[]+?\]\(.+?\)/g,
     bold: /__/,
     longSpace: /\s+/g,
   };
@@ -28,8 +28,10 @@ export class Converter implements IConverter {
   }
 
   private lineProcessing(line: string): string {
-    line = this.internalLink(line);
-    line = this.externalLink(line);
+    line = line.replace(this.regexp.longSpace, ' ');
+
+    // line = this.internalLink(line);
+    // line = this.externalLink(line);
     line = this.title(line);
     return line;
   }
@@ -49,7 +51,6 @@ export class Converter implements IConverter {
     for (const chunk of matched) {
       const currLink: string = chunk[0]
         .slice(2, -2)
-        .replace(this.regexp.longSpace, ' ')
         .replace(/#/g, '');
 
       const link: string[] = currLink.split('|');
@@ -58,7 +59,6 @@ export class Converter implements IConverter {
 
       line = line.replace(chunk[0], `<a href="/${url}">${alias}</a>`);
     }
-
     return line;
   }
 
@@ -66,41 +66,42 @@ export class Converter implements IConverter {
     const iterator: IterableIterator<RegExpMatchArray> = line.matchAll(this.regexp.externalLink);
     const matched: RegExpMatchArray[] = [...iterator];
 
-    if (!matched.length) {
-      return line;
-    }
+    console.log(matched)
 
-    for (const title of matched) {
+    // if (!matched.length) {
+    //   return line;
+    // }
 
-      const newTitle: string = title[1].slice(1, -1);
-      const url = new URL(title[2].slice(1, -1))
-      console.log(newTitle)
-      console.log(url)
-      // const newTitle: string = title[0]
-      //   .slice(2, -2)
-      //   .replace(/#/g, '')
-      //   .replace(/\s+/g, ' ')
-      //   .trim();
-      // const link: string = `<a href="/${newTitle}">${newTitle}</a>`;
-      // line = line.replace(title[0], link);
-    }
+    // for (const chunk of matched) {
+
+    //   const url: string | null = this.getUrl(chunk[2].slice(1, -1).trim());
+    //   const alias: string = chunk[1].slice(1, -1).trim();
+
+    //   if (url) {
+    //     line = line.replace(chunk[0], `<a href="${url}">${alias}</a>`);
+    //   } else {
+    //     line = line.replace(chunk[0], `[${alias}]${chunk[2]}`);
+    //   }
+    // }
 
     return line;
   }
 
   private title(line: string): string {
-    if (!this.regexp.title.test.test(line)) {
-      return line;
-    }
-
-    const matched: RegExpMatchArray | null = line.match(this.regexp.title.tag);
+    const matched: RegExpMatchArray | null = line.match(this.regexp.title.test);
 
     if (!matched) {
       return line;
     }
 
-    matched[0] = matched[0].replace(/\s+/, '');
+    return line.replace(matched[0], `<h${matched[2].length}>`) + `</h${matched[2].length}>`;
+  }
 
-    return line.replace(this.regexp.title.tag, `<h${matched[0].length}>`) + `</h${matched[0].length}>`;
+  private getUrl(url: string): string | null {
+    try {
+      return new URL(url).href;
+    } catch (error) {
+      return null;
+    }
   }
 }
