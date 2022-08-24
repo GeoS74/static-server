@@ -3,10 +3,7 @@ import { IConverter } from "./IConverter";
 
 export class Converter implements IConverter {
   regexp = {
-    title: {
-      test: /^([-]\s+|\s+)?(#+)\s+/,
-      tag: /#+\s+/
-    },
+    title: /^([-]\s+|\s+)?(#+)\s+/,
     internalLink: /\[\[.+?\]\]/g,
     externalLink: /\[[^[]+?\]\(.+?\)/g,
     bold: /__/,
@@ -88,7 +85,7 @@ export class Converter implements IConverter {
   }
 
   private title(line: string): string {
-    const matched: RegExpMatchArray | null = line.match(this.regexp.title.test);
+    const matched: RegExpMatchArray | null = line.match(this.regexp.title);
 
     if (!matched) {
       return line;
