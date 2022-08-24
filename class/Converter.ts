@@ -6,7 +6,7 @@ export class Converter implements IConverter {
     title: /^([-]\s+|\s+)?(#+)\s+/,
     internalLink: /\[\[.+?\]\]/g,
     externalLink: /(\[[^[]+?\])(\(.+?\))/g,
-    bold: /__/,
+    bold: /__.+?__/g,
     longSpace: /\s+/g,
   };
 
@@ -30,10 +30,22 @@ export class Converter implements IConverter {
     line = this.internalLink(line);
     line = this.externalLink(line);
     line = this.title(line);
+    line = this.bold(line);
     return line;
   }
 
   private bold(line: string): string {
+    const iterator: IterableIterator<RegExpMatchArray> = line.matchAll(this.regexp.bold);
+    const matched: RegExpMatchArray[] = [...iterator];
+
+    if (!matched.length) {
+      return line;
+    }
+
+    for (const chunk of matched) {
+      const bold: string = chunk[0].slice(2, -2);
+      line = line.replace(chunk[0], `<b>${bold}</b>`);
+    }
     return line;
   }
 

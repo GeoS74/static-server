@@ -1,48 +1,58 @@
 const regexp = {
-  title: {
-    test: /^([-]\s+|\s+)?(#+)\s+/,
-    tag: /#+\s+/
-  },
+  title: /^([-]\s+|\s+)?(#+)\s+/,
   internalLink: /\[\[.+?\]\]/g,
   externalLink: /(\[[^[]+?\])(\(.+?\))/g,
-  bold: /__/,
+  bold: /__.+?__/g,
   longSpace: /\s+/g,
 };
 
 let str, res;
 
+////////////////////////////////////////////////////bold
+str = 'lorem __ips _u__m__ dolor __sit__ amet';
+res = [...str.matchAll(regexp.bold)]
+// console.log(res);
+
+str = 'text  __b_o_ld__ text';
+res = [...str.matchAll(regexp.bold)]
+// console.log(res);
+
+str = 'text__b__o_ld__ text';
+res = [...str.matchAll(regexp.bold)]
+console.log(res);
+
 
 ////////////////////////////////////////////////////titleTest
 str = '- ### ubuntu';
-res = str.match(regexp.title.test)
+res = str.match(regexp.title)
 // console.log(res);
 
 str = '-    ### ubuntu';
-res = str.match(regexp.title.test)
+res = str.match(regexp.title)
 // console.log(res);
 
 str = '-    ### ubuntu #### test';
-res = str.match(regexp.title.test)
+res = str.match(regexp.title)
 // console.log(res);
 
 str = '-###ubuntu';
-res = str.match(regexp.title.test)
+res = str.match(regexp.title)
 // console.log(res);
 
 str = '-### ubuntu';
-res = str.match(regexp.title.test)
+res = str.match(regexp.title)
 // console.log(res);
 
 str = '- ### ubuntu';
-res = str.match(regexp.title.test)
+res = str.match(regexp.title)
 // console.log(res);
 
 str = ' ### ubuntu';
-res = str.match(regexp.title.test)
+res = str.match(regexp.title)
 // console.log(res);
 
 str = ' asdas ### ubuntu';
-res = str.match(regexp.title.test)
+res = str.match(regexp.title)
 // console.log(res);
 
 
