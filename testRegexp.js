@@ -1,5 +1,6 @@
 const regexp = {
   title: /^([-]\s+|\s+)?(#+)\s+/,
+  image: /!\[\[.+?\]\]/g,
   internalLink: /^\[\[.+?\]\]|[^!]\[\[.+?\]\]/g,
   externalLink: /(\[[^[]+?\])(\(.+?\))/g,
   bold: /[^_]*(__[^_]+?__)[^_]*/g,
@@ -8,6 +9,18 @@ const regexp = {
 };
 
 let str, res;
+
+
+
+////////////////////////////////////////////////////image
+str = '![[hello]] and ![[world]] is my';
+res = [...str.matchAll(regexp.image)]
+// console.log(res);
+
+str = '!![[hello]] and !![[world]] is my';
+res = [...str.matchAll(regexp.image)]
+console.log(res);
+
 
 
 
@@ -51,7 +64,7 @@ res = [...str.matchAll(regexp.bold)]
 // console.log(res);
 
 
-////////////////////////////////////////////////////titleTest
+////////////////////////////////////////////////////title
 str = '- ### ubuntu';
 res = str.match(regexp.title)
 // console.log(res);
@@ -170,4 +183,8 @@ res = [...str.matchAll(regexp.internalLink)]
 
 str = '[[link]] and ![[pic]]';
 res = [...str.matchAll(regexp.internalLink)]
+// console.log(res); 
+
+// str = '![[link]] and ![[pic]]';
+// res = [...str.matchAll(regexp.internalLink)]
 // console.log(res); 

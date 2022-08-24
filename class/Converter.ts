@@ -4,6 +4,7 @@ import { IConverter } from "./IConverter";
 export class Converter implements IConverter {
   regexp = {
     title: /^([-]\s+|\s+)?(#+)\s+/,
+    image: /!\[\[.+?\]\]/g,
     internalLink: /^\[\[.+?\]\]|[^!]\[\[.+?\]\]/g,
     externalLink: /(\[[^[]+?\])(\(.+?\))/g,
     bold: /[^_]*(__[^_]+?__)[^_]*/g,
@@ -26,7 +27,6 @@ export class Converter implements IConverter {
   }
 
   // bold -> cursive
-  // image -> internalLink
   private linePipe(line: string): string {
     line = line.replace(this.regexp.longSpace, ' ');
 
@@ -35,6 +35,7 @@ export class Converter implements IConverter {
     line = this.title(line);
     line = this.bold(line);
     line = this.cursive(line);
+    line = this.image(line);
     return line;
   }
 
@@ -65,6 +66,27 @@ export class Converter implements IConverter {
       console.log(chunk)
       const cursive: string = chunk[1].slice(1, -1);
       line = line.replace(chunk[1], `<i>${cursive}</i>`);
+    }
+    return line;
+  }
+
+  private image(line: string): string {
+    const iterator: IterableIterator<RegExpMatchArray> = line.matchAll(this.regexp.image);
+    const matched: RegExpMatchArray[] = [...iterator];
+
+    if (!matched.length) {
+      return line;
+    }
+
+    for (const chunk of matched) {
+      const link: string[] = chunk[0]
+        .slice(3, -2)
+        .split('|');
+
+      const url: string = link[0].trim();
+      const alias: string = link.length > 1 ? link.slice(1).join('|').trim() : url;
+
+      line = line.replace(chunk[0], `<img src="/${url}" alt="${alias}"/>`);
     }
     return line;
   }
