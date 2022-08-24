@@ -13,17 +13,26 @@ export class Converter implements IConverter {
   };
 
   markdownToHTML(markdown: string): string {
-    const html: string[] = [];
+    const divs: string[] = [];
 
     for (const block of markdown.split(`\n\n`)) {
-      const divs: string[] = [];
+      const lines: string[] = [];
 
       for (const line of block.split(`\n`)) {
-        divs.push(this.linePipe(line));
+        if (line.length) {
+          lines.push(this.linePipe(line));
+        }
       }
-      html.push(divs.join('\n'));
+      const div: string = lines.join('\n');
+      if (div.length) {
+        divs.push(this.divPipe(div));
+      }
     }
-    return html.join('\n\n');
+    return divs.join('\n');
+  }
+
+  private divPipe(div: string): string {
+    return `<div>${div}</div>`;
   }
 
   // bold -> cursive
