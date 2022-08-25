@@ -11,7 +11,9 @@ export class Converter implements IConverter {
     cursive: /[^_]*(_[^_]+?_)[^_]*/g,
     longSpace: /\s+/g,
     list: /-\s+?(.*)/g,
+    code: /^\s*?```/,
   };
+  blockCode: boolean = false;
 
   markdownToHTML(markdown: string): string {
     const divs: string[] = [];
@@ -34,17 +36,20 @@ export class Converter implements IConverter {
   }
 
   private divPipe(div: string): string {
+    if (this.isBlockCode(div)) {
+      return `<pre><code>${div}</code></pre>`
+    }
+
     div = this.list(div);
     return `<div>${div}</div>`;
   }
 
-  private list(div: string): string {
-
-    return div;
-  }
-
   // bold -> cursive
   private linePipe(line: string): string {
+    if (this.isBlockCode(line)) {
+      return line;
+    }
+
     line = line.replace(this.regexp.longSpace, ' ');
 
     line = this.internalLink(line);
@@ -53,7 +58,20 @@ export class Converter implements IConverter {
     line = this.bold(line);
     line = this.cursive(line);
     line = this.image(line);
-    return line;
+    return `<p>${line}</p>`;
+  }
+
+  private isBlockCode(line: string): boolean {
+    if (this.regexp.code.test(line)) {
+      this.blockCode = !this.blockCode;
+      return true;
+    }
+    return this.blockCode;
+  }
+
+  private list(div: string): string {
+
+    return div;
   }
 
   private bold(line: string): string {
