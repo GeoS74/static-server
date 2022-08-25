@@ -11,7 +11,7 @@ export class Converter implements IConverter {
     cursive: /[^_]*(_[^_]+?_)[^_]*/g,
     longSpace: /\s+/g,
     list: /-\s+?(.*)/g,
-    code: /^\s*?```/,
+    code: /^\s*?```|\n\s*?```\s*?/,
   };
   blockCode: boolean = false;
 
@@ -36,12 +36,13 @@ export class Converter implements IConverter {
   }
 
   private divPipe(div: string): string {
-    if (this.isBlockCode(div)) {
-      return `<pre><code>${div}</code></pre>`
-    }
+    return div;
+    // console.log(div)
+    // console.log(div.match(this.regexp.code))
+    // console.log('---------------------------')
 
-    div = this.list(div);
-    return `<div>${div}</div>`;
+    // div = this.list(div);
+    // return `<div>${div}</div>`;
   }
 
   // bold -> cursive
@@ -168,7 +169,7 @@ export class Converter implements IConverter {
 
   private title(line: string): string {
     const matched: RegExpMatchArray | null = line.match(this.regexp.title);
-
+    console.log(matched);
     if (!matched) {
       return line;
     }
