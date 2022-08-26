@@ -8,7 +8,7 @@ export class Converter implements IConverter {
     internalLink: /(^|[^!])(\[\[.+?\]\])/g, //ok
     externalLink: /(\[[^[]*?\])(\(.+?\))/g, //ok
     bold: /(__|\*\*)([^_\*].*?)\1/g, //ok
-    cursive: /(_|\*)([^_\*].*?)\1(\s|$)/g,
+    cursive: /(_|\*)([^_\*].*?)\1(\s|$)/g, //ok
     longSpace: /\s+/g, //ok
     list: /-\s+?(.*)/g,
     code: /^\s*?```|\n\s*?```\s*?/,
