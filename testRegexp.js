@@ -1,11 +1,11 @@
 const regexp = {
-  title: /^([-]\s+|\s*)(#+)(\s+)(.*)/,
+  title: /^([-]\s+|\s*)(#+)(\s+)(.*)/, //ok
   image: /!\[\[.+?\]\]/g,
-  internalLink: /(^|[^!])(\[\[.+?\]\])/g,
-  externalLink: /(\[[^[]+?\])(\(.+?\))/g,
+  internalLink: /(^|[^!])(\[\[.+?\]\])/g, //ok
+  externalLink: /(\[[^[]*?\])(\(.+?\))/g,
   bold: /[^_]*(__[^_]+?__)[^_]*/g,
   cursive: /[^_]*(_[^_]+?_)[^_]*/g,
-  longSpace: /\s+/g,
+  longSpace: /\s+/g, //ok
   list: /-\s+?(.*)/g,
 };
 
@@ -155,7 +155,7 @@ res = [...str.matchAll(regexp.externalLink)]
 
 str = '[alias](http://exa(mpl)e.com)';
 res = [...str.matchAll(regexp.externalLink)]
-// console.log(res); //bad
+console.log(res); //bad
 
 
 ////////////////////////////////////////////////////internalLink

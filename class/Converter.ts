@@ -6,10 +6,10 @@ export class Converter implements IConverter {
     title: /^([-]\s+|\s*)(#+)(\s+)(.*)/, //ok
     image: /!\[\[.+?\]\]/g,
     internalLink: /(^|[^!])(\[\[.+?\]\])/g, //ok
-    externalLink: /(\[[^[]+?\])(\(.+?\))/g,
+    externalLink: /(\[[^[]*?\])(\(.+?\))/g, //ok
     bold: /[^_]*(__[^_]+?__)[^_]*/g,
     cursive: /[^_]*(_[^_]+?_)[^_]*/g,
-    longSpace: /\s+/g,
+    longSpace: /\s+/g, //ok
     list: /-\s+?(.*)/g,
     code: /^\s*?```|\n\s*?```\s*?/,
   };
@@ -54,7 +54,7 @@ export class Converter implements IConverter {
     line = line.replace(this.regexp.longSpace, ' ');
 
     line = this.internalLink(line);
-    // line = this.externalLink(line);
+    line = this.externalLink(line);
     line = this.title(line);
     // line = this.bold(line);
     // line = this.cursive(line);
