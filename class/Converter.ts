@@ -3,7 +3,7 @@ import { IConverter } from "./IConverter";
 
 export class Converter implements IConverter {
   regexp = {
-    title: /^([-]\s+|\s+)?(#+)\s+/,
+    title: /^([-]\s+|\s*)(#+)(\s+)(.*)/,
     image: /!\[\[.+?\]\]/g,
     internalLink: /^\[\[.+?\]\]|[^!]\[\[.+?\]\]/g,
     externalLink: /(\[[^[]+?\])(\(.+?\))/g,
@@ -53,13 +53,14 @@ export class Converter implements IConverter {
 
     line = line.replace(this.regexp.longSpace, ' ');
 
-    line = this.internalLink(line);
-    line = this.externalLink(line);
+    // line = this.internalLink(line);
+    // line = this.externalLink(line);
     line = this.title(line);
-    line = this.bold(line);
-    line = this.cursive(line);
-    line = this.image(line);
-    return `<p>${line}</p>`;
+    // line = this.bold(line);
+    // line = this.cursive(line);
+    // line = this.image(line);
+    return line;
+    // return `<p>${line}</p>`;
   }
 
   private isBlockCode(line: string): boolean {
@@ -169,11 +170,11 @@ export class Converter implements IConverter {
 
   private title(line: string): string {
     const matched: RegExpMatchArray | null = line.match(this.regexp.title);
-    console.log(matched);
+    
     if (!matched) {
       return line;
     }
-    return line.replace(matched[0], `<h${matched[2].length}>`) + `</h${matched[2].length}>`;
+    return `${matched[1]}<h${matched[2].length}>${matched[4]}</h${matched[2].length}>`;
   }
 
   private getUrl(url: string): string | null {

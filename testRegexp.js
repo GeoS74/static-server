@@ -1,5 +1,5 @@
 const regexp = {
-  title: /^([-]\s+|\s+)?(#+)\s+/,
+  title: /^([-]\s+|\s*)(#+)(\s+)(.*)/,
   image: /!\[\[.+?\]\]/g,
   internalLink: /^\[\[.+?\]\]|[^!]\[\[.+?\]\]/g,
   externalLink: /(\[[^[]+?\])(\(.+?\))/g,
@@ -22,7 +22,7 @@ four
 d - space
 `;
 res = [...str.matchAll(regexp.list)]
-console.log(res);
+// console.log(res);
 
 
 
@@ -79,7 +79,15 @@ res = [...str.matchAll(regexp.bold)]
 
 
 ////////////////////////////////////////////////////title
-str = '- ### ubuntu';
+str = '### ubuntu the best';
+res = str.match(regexp.title)
+// console.log(res);
+
+str = ' ### ubuntu the best';
+res = str.match(regexp.title)
+console.log(res);
+
+str = '- ### ubuntu ## the best';
 res = str.match(regexp.title)
 // console.log(res);
 
@@ -100,10 +108,6 @@ res = str.match(regexp.title)
 // console.log(res);
 
 str = '- ### ubuntu';
-res = str.match(regexp.title)
-// console.log(res);
-
-str = ' ### ubuntu';
 res = str.match(regexp.title)
 // console.log(res);
 
