@@ -16,24 +16,44 @@ export class Converter implements IConverter {
   blockCode: boolean = false;
 
   markdownToHTML(markdown: string): string {
-    const divs: string[] = [];
+    const lines: string[] = [];
 
-    for (const block of markdown.split(`\n\n`)) {
-      const lines: string[] = [];
-
-      for (const line of block.split(`\n`)) {
-        if (line.length) {
-          lines.push(this.linePipe(line));
-        }
-      }
-
-      const div: string = lines.join('\n');
-      if (div.length) {
-        divs.push(this.divPipe(div));
-      }
+    for (const line of markdown.split(`\n`)) {
+      lines.push(this.linePipe(line));
     }
-    return divs.join('\n');
+
+    const divs: string[] = lines.join('\n').split(this.regexp.code);
+
+    const foo = divs.map((e, i) => {
+      if(i % 2) {
+        return `<pre><code>${e}</code></pre>`
+      }
+      return `<div>${e}</div>`
+    })
+    console.log(foo)
+
+    return foo.join('\n');
   }
+
+  // markdownToHTML(markdown: string): string {
+  //   const divs: string[] = [];
+
+  //   for (const block of markdown.split(`\n\n`)) {
+  //     const lines: string[] = [];
+
+  //     for (const line of block.split(`\n`)) {
+  //       if (line.length) {
+  //         lines.push(this.linePipe(line));
+  //       }
+  //     }
+
+  //     const div: string = lines.join('\n');
+  //     if (div.length) {
+  //       divs.push(this.divPipe(div));
+  //     }
+  //   }
+  //   return divs.join('\n');
+  // }
 
   private divPipe(div: string): string {
     return div;
@@ -60,7 +80,6 @@ export class Converter implements IConverter {
     line = this.cursive(line);
     line = this.image(line);
     return line;
-    // return `<p>${line}</p>`;
   }
 
   private isBlockCode(line: string): boolean {
@@ -93,7 +112,7 @@ export class Converter implements IConverter {
   private cursive(line: string): string {
     const iterator: IterableIterator<RegExpMatchArray> = line.matchAll(this.regexp.cursive);
     const matched: RegExpMatchArray[] = [...iterator];
-    console.log(matched)
+
     if (!matched.length) {
       return line;
     }
