@@ -93,13 +93,13 @@ export class Converter implements IConverter {
   private cursive(line: string): string {
     const iterator: IterableIterator<RegExpMatchArray> = line.matchAll(this.regexp.cursive);
     const matched: RegExpMatchArray[] = [...iterator];
-
+    console.log(matched)
     if (!matched.length) {
       return line;
     }
 
     for (const chunk of matched) {
-      line = line.replace(chunk[0].slice(0, -1), `<i>${chunk[2]}</i>`);
+      line = line.replace(chunk[0], `<i>${chunk[2]}</i>${chunk[3]}`);
     }
     return line;
   }

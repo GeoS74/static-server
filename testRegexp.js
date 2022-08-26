@@ -4,8 +4,7 @@ const regexp = {
   internalLink: /(^|[^!])(\[\[.+?\]\])/g, //ok
   externalLink: /(\[[^[]*?\])(\(.+?\))/g, //ok
   bold: /(__|\*\*)([^_\*].*?)\1/g, //ok
-  cursive: /(_|\*)([^_\*].*?)\1(\s|$)/g,
-  // cursive: /[^_]*(_[^_]+?_)[^_]*/g,
+  cursive: /(_|\*)([^_\*].*?)\1(\s|$)/g, //ok
   longSpace: /\s+/g, //ok
   list: /-\s+?(.*)/g,
 };
@@ -76,6 +75,10 @@ res = [...str.matchAll(regexp.cursive)]
 // console.log(res);
 
 str = '_f_g_h _ d';
+res = [...str.matchAll(regexp.cursive)]
+// console.log(res);
+
+str = '_f_g_h _d';
 res = [...str.matchAll(regexp.cursive)]
 // console.log(res);
 
