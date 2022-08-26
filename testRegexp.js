@@ -1,9 +1,9 @@
 const regexp = {
   title: /^([-]\s+|\s*)(#+)(\s+)(.*)/, //ok
-  image: /!\[\[.+?\]\]/g,
+  image: /!\[\[.+?\]\]/g, //ok
   internalLink: /(^|[^!])(\[\[.+?\]\])/g, //ok
   externalLink: /(\[[^[]*?\])(\(.+?\))/g, //ok
-  bold: /[^_]*(__[^_]+?__)[^_]*/g,
+  bold: /(__|\*\*)([^_\*]+.*?)\1/g, //ok
   cursive: /[^_]*(_[^_]+?_)[^_]*/g,
   longSpace: /\s+/g, //ok
   list: /-\s+?(.*)/g,
@@ -72,6 +72,10 @@ res = [...str.matchAll(regexp.cursive)]
 
 
 ////////////////////////////////////////////////////bold
+str = '**lorem__ ipsum** dolor__ sit** amet__';
+res = [...str.matchAll(regexp.bold)]
+// console.log(res);
+
 str = 'lorem __ips _u__m__ dolor __sit__ amet';
 res = [...str.matchAll(regexp.bold)]
 // console.log(res);
@@ -84,7 +88,31 @@ str = 'text__b__o_ld__ text';
 res = [...str.matchAll(regexp.bold)]
 // console.log(res);
 
-str = '___text___ font';
+str = '***text*** font';
+res = [...str.matchAll(regexp.bold)]
+// console.log(res);
+
+str = '****text**** font';
+res = [...str.matchAll(regexp.bold)]
+// console.log(res);
+
+str = '*****text***** font';
+res = [...str.matchAll(regexp.bold)]
+// console.log(res);
+
+str = '**te*xt**';
+res = [...str.matchAll(regexp.bold)]
+// console.log(res);
+
+str = '**te**xt**';
+res = [...str.matchAll(regexp.bold)]
+// console.log(res);
+
+str = '****';
+res = [...str.matchAll(regexp.bold)]
+// console.log(res);
+
+str = '**te**xt** *  **foo**  *';
 res = [...str.matchAll(regexp.bold)]
 // console.log(res);
 

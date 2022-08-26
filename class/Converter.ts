@@ -7,7 +7,7 @@ export class Converter implements IConverter {
     image: /!\[\[.+?\]\]/g, //ok
     internalLink: /(^|[^!])(\[\[.+?\]\])/g, //ok
     externalLink: /(\[[^[]*?\])(\(.+?\))/g, //ok
-    bold: /[^_]*(__[^_]+?__)[^_]*/g,
+    bold: /(__|\*\*)([^_\*]+.*?)\1/g, //ok
     cursive: /[^_]*(_[^_]+?_)[^_]*/g,
     longSpace: /\s+/g, //ok
     list: /-\s+?(.*)/g,
@@ -56,7 +56,7 @@ export class Converter implements IConverter {
     line = this.internalLink(line);
     line = this.externalLink(line);
     line = this.title(line);
-    // line = this.bold(line);
+    line = this.bold(line);
     // line = this.cursive(line);
     line = this.image(line);
     return line;
@@ -85,8 +85,7 @@ export class Converter implements IConverter {
     }
 
     for (const chunk of matched) {
-      const bold: string = chunk[1].slice(2, -2);
-      line = line.replace(chunk[1], `<b>${bold}</b>`);
+      line = line.replace(chunk[0], `<b>${chunk[2]}</b>`);
     }
     return line;
   }
