@@ -22,17 +22,7 @@ export class Converter implements IConverter {
       lines.push(this.linePipe(line));
     }
 
-    const divs: string[] = lines.join('\n').split(this.regexp.code);
-
-    const foo = divs.map((e, i) => {
-      if(i % 2) {
-        return `<pre><code>${e}</code></pre>`
-      }
-      return `<div>${e}</div>`
-    })
-    console.log(foo)
-
-    return foo.join('\n');
+    return this.divPipe(lines.join(`\n`))
   }
 
   // markdownToHTML(markdown: string): string {
@@ -55,14 +45,20 @@ export class Converter implements IConverter {
   //   return divs.join('\n');
   // }
 
-  private divPipe(div: string): string {
-    return div;
-    // console.log(div)
-    // console.log(div.match(this.regexp.code))
-    // console.log('---------------------------')
+  private divPipe(page: string): string {
+    page = this.code(page);
+    return page;
+  }
 
-    // div = this.list(div);
-    // return `<div>${div}</div>`;
+  private code(page: string): string {
+    const divs: string[] = page.split(this.regexp.code);
+
+    return divs.map((e: string, i: number): string => {
+      if (i % 2) {
+        return `<pre><code>${e}</code></pre>`
+      }
+      return `<div>${e}</div>`
+    }).join(`\n`)
   }
 
   // bold -> cursive
