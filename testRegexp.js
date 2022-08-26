@@ -1,7 +1,7 @@
 const regexp = {
   title: /^([-]\s+|\s*)(#+)(\s+)(.*)/,
   image: /!\[\[.+?\]\]/g,
-  internalLink: /^\[\[.+?\]\]|[^!]\[\[.+?\]\]/g,
+  internalLink: /(^|[^!])(\[\[.+?\]\])/g,
   externalLink: /(\[[^[]+?\])(\(.+?\))/g,
   bold: /[^_]*(__[^_]+?__)[^_]*/g,
   cursive: /[^_]*(_[^_]+?_)[^_]*/g,
@@ -85,7 +85,7 @@ res = str.match(regexp.title)
 
 str = ' ### ubuntu the best';
 res = str.match(regexp.title)
-console.log(res);
+// console.log(res);
 
 str = '- ### ubuntu ## the best';
 res = str.match(regexp.title)
@@ -159,7 +159,7 @@ res = [...str.matchAll(regexp.externalLink)]
 
 
 ////////////////////////////////////////////////////internalLink
-str = '[[hello]] and [[world]] is my';
+str = ' [[hello]] and [[world]] is my';
 res = [...str.matchAll(regexp.internalLink)]
 // console.log(res);
 
@@ -168,6 +168,10 @@ res = [...str.matchAll(regexp.internalLink)]
 // console.log(res);
 
 str = '[ [   hello]] and [[world   ] ] is my';
+res = [...str.matchAll(regexp.internalLink)]
+// console.log(res);
+
+str = '[[   hello] ] and [ [world   ]] is my';
 res = [...str.matchAll(regexp.internalLink)]
 // console.log(res);
 
@@ -203,6 +207,6 @@ str = '[[link]] and ![[pic]]';
 res = [...str.matchAll(regexp.internalLink)]
 // console.log(res); 
 
-// str = '![[link]] and ![[pic]]';
-// res = [...str.matchAll(regexp.internalLink)]
+str = '[[link]] and [[post]] and ![[pic]]';
+res = [...str.matchAll(regexp.internalLink)]
 // console.log(res); 

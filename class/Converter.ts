@@ -3,9 +3,9 @@ import { IConverter } from "./IConverter";
 
 export class Converter implements IConverter {
   regexp = {
-    title: /^([-]\s+|\s*)(#+)(\s+)(.*)/,
+    title: /^([-]\s+|\s*)(#+)(\s+)(.*)/, //ok
     image: /!\[\[.+?\]\]/g,
-    internalLink: /^\[\[.+?\]\]|[^!]\[\[.+?\]\]/g,
+    internalLink: /(^|[^!])(\[\[.+?\]\])/g, //ok
     externalLink: /(\[[^[]+?\])(\(.+?\))/g,
     bold: /[^_]*(__[^_]+?__)[^_]*/g,
     cursive: /[^_]*(_[^_]+?_)[^_]*/g,
@@ -53,7 +53,7 @@ export class Converter implements IConverter {
 
     line = line.replace(this.regexp.longSpace, ' ');
 
-    // line = this.internalLink(line);
+    line = this.internalLink(line);
     // line = this.externalLink(line);
     line = this.title(line);
     // line = this.bold(line);
@@ -137,7 +137,7 @@ export class Converter implements IConverter {
     }
 
     for (const chunk of matched) {
-      const link: string[] = chunk[0]
+      const link: string[] = chunk[2]
         .slice(2, -2)
         .replace(/#/g, '>')
         .split('|');
@@ -145,7 +145,7 @@ export class Converter implements IConverter {
       const url: string = link[0].trim();
       const alias: string = link.length > 1 ? link.slice(1).join('|').trim() : url;
 
-      line = line.replace(chunk[0], `<a href="/${url}">${alias}</a>`);
+      line = line.replace(chunk[2], `<a href="/${url}">${alias}</a>`);
     }
     return line;
   }
@@ -170,7 +170,7 @@ export class Converter implements IConverter {
 
   private title(line: string): string {
     const matched: RegExpMatchArray | null = line.match(this.regexp.title);
-    
+
     if (!matched) {
       return line;
     }
