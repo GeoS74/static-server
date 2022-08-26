@@ -2,7 +2,7 @@ const regexp = {
   title: /^([-]\s+|\s*)(#+)(\s+)(.*)/, //ok
   image: /!\[\[.+?\]\]/g,
   internalLink: /(^|[^!])(\[\[.+?\]\])/g, //ok
-  externalLink: /(\[[^[]*?\])(\(.+?\))/g,
+  externalLink: /(\[[^[]*?\])(\(.+?\))/g, //ok
   bold: /[^_]*(__[^_]+?__)[^_]*/g,
   cursive: /[^_]*(_[^_]+?_)[^_]*/g,
   longSpace: /\s+/g, //ok
@@ -35,6 +35,17 @@ str = '!![[hello]] and !![[world]] is my';
 res = [...str.matchAll(regexp.image)]
 // console.log(res);
 
+str = '!![[hello]] and !![[world]] is my';
+res = [...str.matchAll(regexp.image)]
+// console.log(res);
+
+str = '!![[he[llo]] and !![[wo]r]ld]] is my';
+res = [...str.matchAll(regexp.image)]
+// console.log(res);
+
+str = '!![[he[[llo]] and !![[wo]]r]ld]] is my';
+res = [...str.matchAll(regexp.image)]
+// console.log(res); //bad
 
 
 
@@ -155,7 +166,7 @@ res = [...str.matchAll(regexp.externalLink)]
 
 str = '[alias](http://exa(mpl)e.com)';
 res = [...str.matchAll(regexp.externalLink)]
-console.log(res); //bad
+// console.log(res); //bad
 
 
 ////////////////////////////////////////////////////internalLink

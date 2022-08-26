@@ -4,7 +4,7 @@ import { IConverter } from "./IConverter";
 export class Converter implements IConverter {
   regexp = {
     title: /^([-]\s+|\s*)(#+)(\s+)(.*)/, //ok
-    image: /!\[\[.+?\]\]/g,
+    image: /!\[\[.+?\]\]/g, //ok
     internalLink: /(^|[^!])(\[\[.+?\]\])/g, //ok
     externalLink: /(\[[^[]*?\])(\(.+?\))/g, //ok
     bold: /[^_]*(__[^_]+?__)[^_]*/g,
@@ -58,7 +58,7 @@ export class Converter implements IConverter {
     line = this.title(line);
     // line = this.bold(line);
     // line = this.cursive(line);
-    // line = this.image(line);
+    line = this.image(line);
     return line;
     // return `<p>${line}</p>`;
   }
