@@ -8,7 +8,7 @@ export class Converter implements IConverter {
     internalLink: /(^|[^!])(\[\[.+?\]\])/g, //ok
     externalLink: /(\[[^[]*?\])(\(.+?\))/g, //ok
     bold: /(__|\*\*)([^_\*].*?)\1/g, //ok
-    cursive: /[^_]*(_[^_]+?_)[^_]*/g,
+    cursive: /(_|\*)([^_\*].*?)\1(\s|$)/g,
     longSpace: /\s+/g, //ok
     list: /-\s+?(.*)/g,
     code: /^\s*?```|\n\s*?```\s*?/,
@@ -57,7 +57,7 @@ export class Converter implements IConverter {
     line = this.externalLink(line);
     line = this.title(line);
     line = this.bold(line);
-    // line = this.cursive(line);
+    line = this.cursive(line);
     line = this.image(line);
     return line;
     // return `<p>${line}</p>`;
@@ -99,9 +99,7 @@ export class Converter implements IConverter {
     }
 
     for (const chunk of matched) {
-      console.log(chunk)
-      const cursive: string = chunk[1].slice(1, -1);
-      line = line.replace(chunk[1], `<i>${cursive}</i>`);
+      line = line.replace(chunk[0].slice(0, -1), `<i>${chunk[2]}</i>`);
     }
     return line;
   }
