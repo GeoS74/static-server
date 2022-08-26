@@ -7,7 +7,7 @@ export class Converter implements IConverter {
     image: /!\[\[.+?\]\]/g, //ok
     internalLink: /(^|[^!])(\[\[.+?\]\])/g, //ok
     externalLink: /(\[[^[]*?\])(\(.+?\))/g, //ok
-    bold: /(__|\*\*)([^_\*]+.*?)\1/g, //ok
+    bold: /(__|\*\*)([^_\*].*?)\1/g, //ok
     cursive: /[^_]*(_[^_]+?_)[^_]*/g,
     longSpace: /\s+/g, //ok
     list: /-\s+?(.*)/g,

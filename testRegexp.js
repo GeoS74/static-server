@@ -3,7 +3,7 @@ const regexp = {
   image: /!\[\[.+?\]\]/g, //ok
   internalLink: /(^|[^!])(\[\[.+?\]\])/g, //ok
   externalLink: /(\[[^[]*?\])(\(.+?\))/g, //ok
-  bold: /(__|\*\*)([^_\*]+.*?)\1/g, //ok
+  bold: /(__|\*\*)([^_\*].*?)\1/g, //ok
   cursive: /[^_]*(_[^_]+?_)[^_]*/g,
   longSpace: /\s+/g, //ok
   list: /-\s+?(.*)/g,
@@ -84,9 +84,9 @@ str = 'text  __b_o_ld__ text';
 res = [...str.matchAll(regexp.bold)]
 // console.log(res);
 
-str = 'text__b__o_ld__ text';
+str = 'text__b____o_ld__ text';
 res = [...str.matchAll(regexp.bold)]
-// console.log(res);
+// console.log(res); //bad
 
 str = '***text*** font';
 res = [...str.matchAll(regexp.bold)]
