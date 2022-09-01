@@ -10,96 +10,25 @@ export class Converter implements IConverter {
     bold: /(__|\*\*)([^_\*].*?)\1/g, //ok
     cursive: /(_|\*)([^_\*].*?)\1(\s|$)/g, //ok
     longSpace: /\s+/g, //ok
-    list: /^-\s+.*/,
+    ul: /^-\s+(.*)/,
     code: /^\s*?```|\n\s*?```\s*?/,
   };
   codeBlock: boolean = false;
+  ulBlock: boolean = false;
 
   markdownToHTML(markdown: string): string {
-    const lines: string[] = [];
-
-    for (const line of markdown.split(`\n`)) {
-      lines.push(this.linePipe(line));
-    }
-
-    const blocks: string[] = lines.join(`\n`).split(this.regexp.code);
-
-    return blocks.map((block: string, i: number): string => {
-      if (i % 2) {
-        return this.code(block)
-      }
-      return this.divPipe(block)
-    }).join(`\n`)
-  }
-
-  // markdownToHTML(markdown: string): string {
-  //   const divs: string[] = [];
-
-  //   for (const block of markdown.split(`\n\n`)) {
-  //     const lines: string[] = [];
-
-  //     for (const line of block.split(`\n`)) {
-  //       if (line.length) {
-  //         lines.push(this.linePipe(line));
-  //       }
-  //     }
-
-  //     const div: string = lines.join('\n');
-  //     if (div.length) {
-  //       divs.push(this.divPipe(div));
-  //     }
-  //   }
-  //   return divs.join('\n');
-  // }
-
-  private divPipe(block: string): string {
-    return block.split('\n\n').map((div: string) => {
-      div = this.div(div);
-      div = this.list(div);
-      return div;
-    })
-      .join('\n\n')
-  }
-
-  private list(block: string): string {
-    const ul: string[] = [];
-    return block
+    return markdown
       .split('\n')
-      .map((line: string) => {
-        if (this.regexp.list.test(line)) {
-          ul.push(`<li>${line.slice(2)}</li>`)
+      .map((line: string): string => this.linePipe(line))
+      .join(`\n`)
+      .split(this.regexp.code)
+      .map((block: string, i: number): string => {
+        if (i % 2) {
+          return this.code(block)
         }
-
-        // if(this.isUlBlock(line)){
-        //   return 
-        // }
-        console.log(line)
-        return line
+        return block;
       })
-      .join('\n');
-
-
-
-
-    // const iterator: IterableIterator<RegExpMatchArray> = block.matchAll(this.regexp.list);
-    // const matched: RegExpMatchArray[] = [...iterator];
-
-    // if (!matched.length) {
-    //   return block;
-    // }
-
-    // for (const chunk of matched) {
-    //   console.log(chunk)
-    //   block = block.replace(chunk[0], `<li>${chunk[0].slice(2)}</li>`);
-    // }
-    // return block;
-  }
-
-  private div(block: string): string {
-    return block
-      .split('\n\n')
-      .map(b => `<div>${b}</div>`)
-      .join('\n')
+      .join(`\n`);
   }
 
   private code(block: string): string {
@@ -120,6 +49,21 @@ export class Converter implements IConverter {
     line = this.bold(line);
     line = this.cursive(line);
     line = this.image(line);
+    line = this.ul(line);
+    return line;
+  }
+
+  private ul(line: string): string {
+    const matched: RegExpMatchArray | null = line.match(this.regexp.ul);
+
+    if (!matched) {
+      line = this.ulBlock ? `</ul>${line}` : line;
+      this.ulBlock = false;
+    }
+    else {
+      line = this.ulBlock ? `<li>${matched[1]}</li>` : `<ul><li>${matched[1]}</li>`;
+      this.ulBlock = true;
+    }
     return line;
   }
 
