@@ -11,12 +11,21 @@ export class Converter implements IConverter {
     cursive: /(_|\*)([^_\*].*?)\1(\s|$)/g, //ok
     longSpace: /\s+/g, //ok
     ul: /^-\s+(.*)/,
+    ol: /^(\d)\.\s+(.*)/,
     code: /^\s*?```|\n\s*?```\s*?/,
   };
   codeBlock: boolean = false;
   ulBlock: boolean = false;
+  olBlock: boolean = false;
+
+  private resetFlags(): void {
+    this.codeBlock = false;
+    this.ulBlock = false;
+    this.olBlock = false;
+  }
 
   markdownToHTML(markdown: string): string {
+    this.resetFlags();
     return markdown
       .split('\n')
       .map((line: string): string => this.linePipe(line))
@@ -50,6 +59,21 @@ export class Converter implements IConverter {
     line = this.cursive(line);
     line = this.image(line);
     line = this.ul(line);
+    line = this.ol(line);
+    return line;
+  }
+
+  private ol(line: string): string {
+    const matched: RegExpMatchArray | null = line.match(this.regexp.ol);
+
+    if (!matched) {
+      line = this.olBlock ? `</ol>${line}` : line;
+      this.olBlock = false;
+    }
+    else {
+      line = this.olBlock ? `<li>${matched[2]}</li>` : `<ol start="${matched[1]}"><li>${matched[2]}</li>`;
+      this.olBlock = true;
+    }
     return line;
   }
 
