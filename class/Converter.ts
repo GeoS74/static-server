@@ -31,35 +31,29 @@ export class Converter implements IConverter {
       .map((line: string): string => this.linePipe(line))
       .join(`\n`)
       .split(this.regexp.code)
-      .map((block: string, i: number): string => {
-        if (i % 2) {
-          return this.code(block)
-        }
-        return block;
-      })
+      .map((block: string, i: number): string => (i % 2) ? this.code(block) : block)
       .join(`\n`);
   }
+
+  private list(p: string): string {
+
+    return p;
+  }
+
 
   private code(block: string): string {
     return `<pre><code>${block}</code></pre>`
   }
 
-  // bold -> cursive
-  private linePipe(line: string): string {
-    if (this.isCodeBlock(line)) {
-      return line;
+  private closedTag(line: string): string {
+    if(this.ulBlock) {
+      this.ulBlock = false;
+      return `</li></ul>${line}`;
     }
-
-    line = line.replace(this.regexp.longSpace, ' ');
-
-    line = this.internalLink(line);
-    line = this.externalLink(line);
-    line = this.title(line);
-    line = this.bold(line);
-    line = this.cursive(line);
-    line = this.image(line);
-    line = this.ul(line);
-    line = this.ol(line);
+    if(this.olBlock) {
+      this.olBlock = false;
+      return `</li></ol>${line}`;
+    }
     return line;
   }
 
@@ -67,11 +61,12 @@ export class Converter implements IConverter {
     const matched: RegExpMatchArray | null = line.match(this.regexp.ol);
 
     if (!matched) {
-      line = this.olBlock ? `</ol>${line}` : line;
-      this.olBlock = false;
+      // line = this.olBlock ? `</ol>${line}` : line;
+      // this.olBlock = false;
+      return this.closedTag(line);
     }
     else {
-      line = this.olBlock ? `<li>${matched[2]}</li>` : `<ol start="${matched[1]}"><li>${matched[2]}</li>`;
+      line = this.olBlock ? `</li><li>${matched[2]}` : `<ol start="${matched[1]}"><li>${matched[2]}`;
       this.olBlock = true;
     }
     return line;
@@ -81,13 +76,43 @@ export class Converter implements IConverter {
     const matched: RegExpMatchArray | null = line.match(this.regexp.ul);
 
     if (!matched) {
-      line = this.ulBlock ? `</ul>${line}` : line;
-      this.ulBlock = false;
+
+      // line = this.ulBlock ? `</ul>${line}` : line;
+      // line = this.closedTag(line);
+      // this.ulBlock = false;
+      
+      return this.closedTag(line);
     }
     else {
-      line = this.ulBlock ? `<li>${matched[1]}</li>` : `<ul><li>${matched[1]}</li>`;
+      line = this.ulBlock ? `</li><li>${matched[1]}` : `<ul><li>${matched[1]}`;
       this.ulBlock = true;
     }
+    return this.closedTag(line);
+  }
+
+  // bold -> cursive
+  private linePipe(line: string): string {
+    if (this.isCodeBlock(line)) {
+      //
+      return line;
+    }
+
+    line = line.replace(this.regexp.longSpace, ' ');
+
+    if(!line.trim()){
+      //
+    }
+
+    line = this.internalLink(line);
+    line = this.externalLink(line);
+    line = this.title(line);
+    line = this.bold(line);
+    line = this.cursive(line);
+    line = this.image(line);
+    line = this.list(line);
+    line = this.ul(line);
+    line = this.ol(line);
+    // line = this.closedTag(line);
     return line;
   }
 
