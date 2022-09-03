@@ -225,6 +225,9 @@ export class Converter implements IConverter {
     if (!matched) {
       return line;
     }
+    // console.log(line)
+    // console.log(this.regexp.longSpace.test(matched[1]))
+    // console.log(matched[1])
     return `${matched[1]}<h${matched[2].length}>${matched[4]}</h${matched[2].length}>`;
   }
 
