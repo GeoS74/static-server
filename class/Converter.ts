@@ -11,12 +11,50 @@ export class Converter implements IConverter {
     cursive: /(_|\*)([^_\*].*?)\1(\s|$)/g, //ok
     longSpace: /\s+/g, //ok
     ul: /^-\s+(.*)/,
-    ol: /^(\d)\.\s+(.*)/,
+    ol: /^(\d)[\.\)]\s+(.*)/,
     code: /^\s*?```|\n\s*?```\s*?/,
+    paragraph: /[\w\dа-яА-Я]/,
   };
   codeBlock: boolean = false;
   ulBlock: boolean = false;
   olBlock: boolean = false;
+  tag = {
+    type: '',
+    open: '',
+    close: '',
+  }
+
+  private setTag(tag?: string, start?: number): void {
+    switch (tag) {
+      case 'ul':
+        this.tag = {
+          type: 'ul',
+          open: '<ul>',
+          close: '</li></ul>',
+        }
+        break;
+      case 'ol':
+        this.tag = {
+          type: 'ol',
+          open: `<ol start="${start || 1}">`,
+          close: '</li></ol>',
+        }
+        break;
+      case 'code':
+        this.tag = {
+          type: 'code',
+          open: '',
+          close: '',
+        }
+        break;
+      default:
+        this.tag = {
+          type: '',
+          open: '',
+          close: '',
+        }
+    }
+  }
 
   private resetFlags(): void {
     this.codeBlock = false;
@@ -31,13 +69,41 @@ export class Converter implements IConverter {
       .map((line: string): string => this.linePipe(line))
       .join(`\n`)
       .split(this.regexp.code)
-      .map((block: string, i: number): string => (i % 2) ? this.code(block) : block)
+      .map((block: string, i: number): string => (i % 2) ? this.code(block) : this.div(block))
       .join(`\n`);
   }
 
-  private list(p: string): string {
+  private div(block: string): string {
+    return block
+      .split('\n\n')
+      .map((b: string): string => `<div>${b}</div>`)
+      .join('');
+  }
 
-    return p;
+  private list(line: string): string {
+    let matched: RegExpMatchArray | null = line.match(this.regexp.ul);
+    if (matched) {
+      if (this.tag.type !== 'ul') {
+        let tags: string = this.tag.close;
+        this.setTag('ul');
+        tags += this.tag.open;
+        return `${tags}<li>${matched[1]}`;
+      }
+      return `</li><li>${matched[1]}`;
+    }
+
+    matched = line.match(this.regexp.ol);
+    if (matched) {
+      if (this.tag.type !== 'ol') {
+        let tags: string = this.tag.close;
+        this.setTag('ol', Number.parseInt(matched[1]));
+        tags += this.tag.open;
+        return `${tags}<li>${matched[2]}`;
+      }
+      return `</li><li>${matched[2]}`;
+    }
+
+    return line;
   }
 
 
@@ -46,15 +112,23 @@ export class Converter implements IConverter {
   }
 
   private closedTag(line: string): string {
-    if(this.ulBlock) {
+    if (this.ulBlock) {
       this.ulBlock = false;
       return `</li></ul>${line}`;
     }
-    if(this.olBlock) {
+    if (this.olBlock) {
       this.olBlock = false;
       return `</li></ol>${line}`;
     }
     return line;
+  }
+
+
+  private paragraph(line: string): string {
+    if (!this.regexp.paragraph.test(line) || this.tag.type) {
+      return line;
+    }
+    return `<p>${line}</p>`;
   }
 
   private ol(line: string): string {
@@ -80,7 +154,7 @@ export class Converter implements IConverter {
       // line = this.ulBlock ? `</ul>${line}` : line;
       // line = this.closedTag(line);
       // this.ulBlock = false;
-      
+
       return this.closedTag(line);
     }
     else {
@@ -93,14 +167,19 @@ export class Converter implements IConverter {
   // bold -> cursive
   private linePipe(line: string): string {
     if (this.isCodeBlock(line)) {
-      //
+      if (this.tag.close) {
+        line = `${this.tag.close}\n${line}`;
+        this.setTag();
+      }
       return line;
     }
 
     line = line.replace(this.regexp.longSpace, ' ');
 
-    if(!line.trim()){
-      //
+    if (!line.trim()) {
+      line = this.tag.close + line;
+      this.setTag();
+      return line;
     }
 
     line = this.internalLink(line);
@@ -110,18 +189,18 @@ export class Converter implements IConverter {
     line = this.cursive(line);
     line = this.image(line);
     line = this.list(line);
-    line = this.ul(line);
-    line = this.ol(line);
-    // line = this.closedTag(line);
+    line = this.paragraph(line);
     return line;
   }
 
   private isCodeBlock(line: string): boolean {
     if (this.regexp.code.test(line)) {
-      this.codeBlock = !this.codeBlock;
+      this.setTag(this.tag.type !== 'code' ? 'code' : undefined);
+      // this.codeBlock = !this.codeBlock;
       return true;
     }
-    return this.codeBlock;
+    // return this.codeBlock;
+    return this.tag.type === 'code';
   }
 
   private bold(line: string): string {

@@ -59,7 +59,7 @@ function _readFile(fname: string): Promise<string | void> {
 }
 
 function _getFilePath(fname: string): string {
- return path.join(__dirname, `../../wiki/${fname}`); 
+ return path.join(__dirname, `../../../wiki/${fname}`); 
 }
 
 function _getFileName(path: string): string {
