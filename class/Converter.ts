@@ -44,13 +44,15 @@ export class Converter implements IConverter {
   }
 
   markdownToHTML(markdown: string): string {
+    this.codeBlock = false;
+    this.tag = {};
     return markdown
       .split('\n')
       .map((line: string): string => this.linePipe(line))
       .join(`\n`)
       .split(this.regexp.code)
       .map((block: string, i: number): string => (i % 2) ? this.code(block) : this.div(block))
-      .join(`\n`);
+      .join(`\n`) + this.tag.close || '';
   }
 
   private div(block: string): string {
