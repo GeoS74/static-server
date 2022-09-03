@@ -3,7 +3,7 @@ import { IConverter } from "./IConverter";
 
 export class Converter implements IConverter {
   regexp = {
-    title: /^([-]\s+|\s*)(#+)(\s+)(.*)/, //ok
+    title: /^([-]\s+|\d[\)\.]\s+|\s*)(#+)(\s+)(.*)/, //ok
     image: /!\[\[.+?\]\]/g, //ok
     internalLink: /(^|[^!])(\[\[.+?\]\])/g, //ok
     externalLink: /(\[[^[]*?\])(\(.+?\))/g, //ok
@@ -37,9 +37,6 @@ export class Converter implements IConverter {
           open: `<ol start="${start || 1}">`,
           close: '</li></ol>',
         }
-        break;
-      case 'code':
-        this.tag = {type: 'code'}
         break;
       default:
         this.tag = {}
@@ -132,12 +129,10 @@ export class Converter implements IConverter {
 
   private isCodeBlock(line: string): boolean {
     if (this.regexp.code.test(line)) {
-      // this.setTag(this.tag.type === 'code' ? undefined : 'code');
       this.codeBlock = !this.codeBlock;
       return true;
     }
     return this.codeBlock;
-    // return this.tag.type === 'code';
   }
 
   private bold(line: string): string {
