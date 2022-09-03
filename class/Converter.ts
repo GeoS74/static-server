@@ -18,11 +18,11 @@ export class Converter implements IConverter {
   codeBlock: boolean = false;
   ulBlock: boolean = false;
   olBlock: boolean = false;
-  tag = {
-    type: '',
-    open: '',
-    close: '',
-  }
+  tag: {
+    type?: string,
+    open?: string,
+    close?: string,
+  } = {}
 
   private setTag(tag?: string, start?: number): void {
     switch (tag) {
@@ -43,16 +43,10 @@ export class Converter implements IConverter {
       case 'code':
         this.tag = {
           type: 'code',
-          open: '',
-          close: '',
         }
         break;
       default:
-        this.tag = {
-          type: '',
-          open: '',
-          close: '',
-        }
+        this.tag = {}
     }
   }
 
@@ -75,16 +69,16 @@ export class Converter implements IConverter {
 
   private div(block: string): string {
     return block
-      .split('\n\n')
-      .map((b: string): string => `<div>${b}</div>`)
-      .join('');
+      // .split('\n\n')
+      // .map((b: string): string => `<div>${b}</div>`)
+      // .join('');
   }
 
   private list(line: string): string {
     let matched: RegExpMatchArray | null = line.match(this.regexp.ul);
     if (matched) {
       if (this.tag.type !== 'ul') {
-        let tags: string = this.tag.close;
+        let tags: string = this.tag.close || '';
         this.setTag('ul');
         tags += this.tag.open;
         return `${tags}<li>${matched[1]}`;
@@ -95,7 +89,7 @@ export class Converter implements IConverter {
     matched = line.match(this.regexp.ol);
     if (matched) {
       if (this.tag.type !== 'ol') {
-        let tags: string = this.tag.close;
+        let tags: string = this.tag.close || '';
         this.setTag('ol', Number.parseInt(matched[1]));
         tags += this.tag.open;
         return `${tags}<li>${matched[2]}`;
@@ -177,7 +171,7 @@ export class Converter implements IConverter {
     line = line.replace(this.regexp.longSpace, ' ');
 
     if (!line.trim()) {
-      line = this.tag.close + line;
+      line = (this.tag.close || '') + line;
       this.setTag();
       return line;
     }
@@ -195,12 +189,12 @@ export class Converter implements IConverter {
 
   private isCodeBlock(line: string): boolean {
     if (this.regexp.code.test(line)) {
-      this.setTag(this.tag.type !== 'code' ? 'code' : undefined);
-      // this.codeBlock = !this.codeBlock;
+      // this.setTag(this.tag.type !== 'code' ? 'code' : undefined);
+      this.codeBlock = !this.codeBlock;
       return true;
     }
-    // return this.codeBlock;
-    return this.tag.type === 'code';
+    return this.codeBlock;
+    // return this.tag.type === 'code';
   }
 
   private bold(line: string): string {
