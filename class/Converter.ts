@@ -13,7 +13,7 @@ export class Converter implements IConverter {
     ul: /^-\s+(.*)/,
     ol: /^(\d)[\.\)]\s+(.*)/,
     code: /^\s*?```|\n\s*?```\s*?/,
-    paragraph: /[\w\dа-яА-Я]/,
+    paragraph: /^[\w\dа-яА-Я]/,
   };
   codeBlock: boolean = false;
   tag: {
@@ -51,15 +51,8 @@ export class Converter implements IConverter {
       .map((line: string): string => this.linePipe(line))
       .join(`\n`)
       .split(this.regexp.code)
-      .map((block: string, i: number): string => (i % 2) ? this.code(block) : this.div(block))
+      .map((block: string, i: number): string => (i % 2) ? this.code(block) : block)
       .join(`\n`) + (this.tag.close || '');
-  }
-
-  private div(block: string): string {
-    return block
-      // .split('\n\n')
-      // .map((b: string): string => `<div>${b}</div>`)
-      // .join('');
   }
 
   private list(line: string): string {
