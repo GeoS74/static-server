@@ -16,8 +16,6 @@ export class Converter implements IConverter {
     paragraph: /[\w\dа-яА-Я]/,
   };
   codeBlock: boolean = false;
-  ulBlock: boolean = false;
-  olBlock: boolean = false;
   tag: {
     type?: string,
     open?: string,
@@ -41,23 +39,14 @@ export class Converter implements IConverter {
         }
         break;
       case 'code':
-        this.tag = {
-          type: 'code',
-        }
+        this.tag = {type: 'code'}
         break;
       default:
         this.tag = {}
     }
   }
 
-  private resetFlags(): void {
-    this.codeBlock = false;
-    this.ulBlock = false;
-    this.olBlock = false;
-  }
-
   markdownToHTML(markdown: string): string {
-    this.resetFlags();
     return markdown
       .split('\n')
       .map((line: string): string => this.linePipe(line))
@@ -105,57 +94,11 @@ export class Converter implements IConverter {
     return `<pre><code>${block}</code></pre>`
   }
 
-  private closedTag(line: string): string {
-    if (this.ulBlock) {
-      this.ulBlock = false;
-      return `</li></ul>${line}`;
-    }
-    if (this.olBlock) {
-      this.olBlock = false;
-      return `</li></ol>${line}`;
-    }
-    return line;
-  }
-
-
   private paragraph(line: string): string {
     if (!this.regexp.paragraph.test(line) || this.tag.type) {
       return line;
     }
     return `<p>${line}</p>`;
-  }
-
-  private ol(line: string): string {
-    const matched: RegExpMatchArray | null = line.match(this.regexp.ol);
-
-    if (!matched) {
-      // line = this.olBlock ? `</ol>${line}` : line;
-      // this.olBlock = false;
-      return this.closedTag(line);
-    }
-    else {
-      line = this.olBlock ? `</li><li>${matched[2]}` : `<ol start="${matched[1]}"><li>${matched[2]}`;
-      this.olBlock = true;
-    }
-    return line;
-  }
-
-  private ul(line: string): string {
-    const matched: RegExpMatchArray | null = line.match(this.regexp.ul);
-
-    if (!matched) {
-
-      // line = this.ulBlock ? `</ul>${line}` : line;
-      // line = this.closedTag(line);
-      // this.ulBlock = false;
-
-      return this.closedTag(line);
-    }
-    else {
-      line = this.ulBlock ? `</li><li>${matched[1]}` : `<ul><li>${matched[1]}`;
-      this.ulBlock = true;
-    }
-    return this.closedTag(line);
   }
 
   // bold -> cursive
@@ -189,7 +132,7 @@ export class Converter implements IConverter {
 
   private isCodeBlock(line: string): boolean {
     if (this.regexp.code.test(line)) {
-      // this.setTag(this.tag.type !== 'code' ? 'code' : undefined);
+      // this.setTag(this.tag.type === 'code' ? undefined : 'code');
       this.codeBlock = !this.codeBlock;
       return true;
     }
