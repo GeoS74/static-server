@@ -52,7 +52,7 @@ export class Converter implements IConverter {
       .join(`\n`)
       .split(this.regexp.code)
       .map((block: string, i: number): string => (i % 2) ? this.code(block) : this.div(block))
-      .join(`\n`) + this.tag.close || '';
+      .join(`\n`) + (this.tag.close || '');
   }
 
   private div(block: string): string {
