@@ -1,6 +1,7 @@
 import * as http from 'http';
 import * as path from 'path';
 import * as fs from 'fs';
+import fetch from 'node-fetch';
 
 import { Converter } from './class/Converter';
 
@@ -26,14 +27,14 @@ server.on('request', async (request: http.IncomingMessage, response: http.Server
   } catch (error) {
     response.setHeader('content-type', 'application/json')
 
-    if(_isNodeError(error) && error.code === 'ENOENT'){
+    if (_isNodeError(error) && error.code === 'ENOENT') {
       response.statusCode = 404;
       response.end(_errorToJSON('file not found'));
       return;
     }
-    
+
     if (error instanceof Error) {
-      console.log(error.message); 
+      console.log(error.message);
     }
     response.statusCode = 500;
     response.end(_errorToJSON('internal server error'));
@@ -58,8 +59,19 @@ function _readFile(fname: string): Promise<string | void> {
     });
 }
 
+// function _readFile(fname: string): Promise<string> {
+//   return fetch(`https://github.com/GeoS74/wiki/blob/main/${fname}`)
+//   .then(async (response) => {
+//     const foo = await response.text();
+//     console.log(response.status);
+//     console.log(`https://github.com/GeoS74/wiki/blob/main/${fname}`)
+//     return foo
+//   })
+//   .catch(error=> error.message)
+// }
+
 function _getFilePath(fname: string): string {
- return path.join(__dirname, `../../../wiki/${fname}`); 
+  return path.join(__dirname, `../../../wiki/${fname}`);
 }
 
 function _getFileName(path: string): string {

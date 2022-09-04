@@ -1,0 +1,7 @@
+#!/bin/bash
+if [ -d ./repo ]
+then
+git pull https://github.com/GeoS74/wiki.git
+else
+git clone https://github.com/GeoS74/wiki.git repo
+fi
