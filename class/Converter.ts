@@ -13,7 +13,8 @@ export class Converter implements IConverter {
     ul: /^-\s+(.*)/,
     ol: /^(\d)[\.\)]\s+(.*)/,
     code: /^\s*?```|\n\s*?```\s*?/,
-    paragraph: /^\s*#?([\w\dа-яА-Я]|<[bia][\s>]|<small>)/, //ok
+    shortcode: /`(.*?)`/g,
+    paragraph: /^\s*#?([\w\dа-яА-Я]|<[bia][\s>]|<small>|<code>)/, //ok
     blockquote: /^\s*>\s*(.*)/,
     hashtag: /#([\w\dа-яА-Я]+)/g,
   };
@@ -92,7 +93,7 @@ export class Converter implements IConverter {
 
 
   private code(block: string): string {
-    return `<pre><code>${block}</code></pre>`
+    return `<pre><code>${block.replace(/[<>]/g, '')}</code></pre>`
   }
 
   private paragraph(line: string): string {
@@ -129,9 +130,22 @@ export class Converter implements IConverter {
     line = this.list(line);
     line = this.hashtag(line);
     line = this.blockquote(line);
+    line = this.shortcode(line);
     line = this.paragraph(line);
-    
-    
+    return line;
+  }
+
+  private shortcode(line: string): string {
+    const iterator: IterableIterator<RegExpMatchArray> = line.matchAll(this.regexp.shortcode);
+    const matched: RegExpMatchArray[] = [...iterator];
+
+    if (!matched.length) {
+      return line;
+    }
+
+    for (const chunk of matched) {
+      line = line.replace(chunk[0], `<code>${chunk[1]}</code>`);
+    }
     return line;
   }
 
