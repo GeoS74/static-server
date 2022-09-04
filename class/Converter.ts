@@ -13,7 +13,8 @@ export class Converter implements IConverter {
     ul: /^-\s+(.*)/,
     ol: /^(\d)[\.\)]\s+(.*)/,
     code: /^\s*?```|\n\s*?```\s*?/,
-    paragraph: /^[\w\dа-яА-Я]/,
+    paragraph: /^\s*([\w\dа-яА-Я]|<[bia][\s>])/, //ok
+    blockquote: /^\s*>\s*(.*)/,
   };
   codeBlock: boolean = false;
   tag: {
@@ -36,6 +37,13 @@ export class Converter implements IConverter {
           type: 'ol',
           open: `<ol start="${start || 1}">`,
           close: '</li></ol>',
+        }
+        break;
+      case 'blockquote':
+        this.tag = {
+          type: 'blockquote',
+          open: '<blockquote>',
+          close: '</p></blockquote>',
         }
         break;
       default:
@@ -119,6 +127,24 @@ export class Converter implements IConverter {
     line = this.image(line);
     line = this.list(line);
     line = this.paragraph(line);
+    line = this.blockquote(line);
+    return line;
+  }
+
+  private blockquote(line: string): string {
+    let matched: RegExpMatchArray | null = line.match(this.regexp.blockquote);
+    if (matched) {
+      if(!matched[1].trim()) {
+        return '';
+      }
+      if (this.tag.type !== 'blockquote') {
+        let tags: string = this.tag.close || '';
+        this.setTag('blockquote');
+        tags += this.tag.open;
+        return `${tags}<p>${matched[1]}`;
+      }
+      return `</p><p>${matched[1]}`;
+    }
     return line;
   }
 

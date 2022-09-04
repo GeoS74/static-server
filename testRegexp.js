@@ -7,10 +7,28 @@ const regexp = {
   cursive: /(_|\*)([^_\*].*?)\1(\s|$)/g, //ok
   longSpace: /\s+/g, //ok
   list: /-\s+?(.*)/g,
+  paragraph: /^\s*([\w\dа-яА-Я]|<[bia][\s>])/,
 };
 
 let str, res;
 
+
+////////////////////////////////////////////////////paragraph
+str = '  ubuntu the best';
+res = str.match(regexp.paragraph)
+// console.log(res);
+
+str = '<a>ubuntu the best';
+res = str.match(regexp.paragraph)
+// console.log(res);
+
+str = '<b>ubuntu the best';
+res = str.match(regexp.paragraph)
+// console.log(res);
+
+str = '<blockquote>ubuntu the best';
+res = str.match(regexp.paragraph)
+console.log(res);
 
 ////////////////////////////////////////////////////list
 str = `
