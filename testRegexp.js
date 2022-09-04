@@ -7,11 +7,16 @@ const regexp = {
   cursive: /(_|\*)([^_\*].*?)\1(\s|$)/g, //ok
   longSpace: /\s+/g, //ok
   list: /-\s+?(.*)/g,
-  paragraph: /^\s*([\w\dа-яА-Я]|<[bia][\s>])/,
+  paragraph: /^\s*#?([\w\dа-яА-Я]|<[bia][\s>]|<small>)/, //ok
+  hashtag: /#([\w\dа-яА-Я]+)/g,
 };
 
 let str, res;
 
+////////////////////////////////////////////////////hashtag
+str = 'foo #tag and #тег2';
+res = [...str.matchAll(regexp.hashtag)]
+// console.log(res);
 
 ////////////////////////////////////////////////////paragraph
 str = '  ubuntu the best';
@@ -28,7 +33,15 @@ res = str.match(regexp.paragraph)
 
 str = '<blockquote>ubuntu the best';
 res = str.match(regexp.paragraph)
-console.log(res);
+// console.log(res);
+
+str = '<small>ubuntu the best';
+res = str.match(regexp.paragraph)
+// console.log(res);
+
+str = '#ubuntu the best';
+res = str.match(regexp.paragraph)
+// console.log(res);
 
 ////////////////////////////////////////////////////list
 str = `
