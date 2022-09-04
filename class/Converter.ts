@@ -17,6 +17,7 @@ export class Converter implements IConverter {
     paragraph: /^\s*#?([\w\dа-яА-Я]|<[bia][\s>]|<small>|<code>)/, //ok
     blockquote: /^\s*>\s*(.*)/,
     hashtag: /#([\w\dа-яА-Я]+)/g,
+    ecsapetag: /<(Buffer.*?)>/g,
   };
   codeBlock: boolean = false;
   tag: {
@@ -93,7 +94,15 @@ export class Converter implements IConverter {
 
 
   private code(block: string): string {
-    return `<pre><code>${block.replace(/[<>]/g, '')}</code></pre>`
+    const iterator: IterableIterator<RegExpMatchArray> = block.matchAll(this.regexp.ecsapetag);
+    const matched: RegExpMatchArray[] = [...iterator];
+
+    if (matched.length) {
+      for (const chunk of matched) {
+        block = block.replace(chunk[0], chunk[1]);
+      }
+    }
+    return `<pre><code>${block}</code></pre>`
   }
 
   private paragraph(line: string): string {
