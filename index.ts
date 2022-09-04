@@ -1,12 +1,23 @@
 import * as http from 'http';
 import * as path from 'path';
 import * as fs from 'fs';
-import fetch from 'node-fetch';
 
+import { execFile } from 'node:child_process';
+import { ExecFileException } from 'child_process';
+import { config } from './config';
 import { Converter } from './class/Converter';
 
 const server: http.Server = http.createServer();
 const converter: Converter = new Converter();
+
+(function sync(): void {
+  execFile('./sync', [config.repository.url, config.repository.path], (error: ExecFileException | null, stdout: string, stderr: string): string | void => {
+    if (error) {
+      console.log(`error sync: ${error.message}`);
+    }
+    setTimeout((): void => sync(), config.repository.syncDelay);
+  });
+}());
 
 server.on('request', async (request: http.IncomingMessage, response: http.ServerResponse): Promise<void> => {
   try {
@@ -17,15 +28,14 @@ server.on('request', async (request: http.IncomingMessage, response: http.Server
     }
 
     if (request?.url) {
-      const url = new URL(request.url, 'http://localhost:3500');
-      const fname: string = _getFileName(url.pathname);
+      const fname: string = _getFileName(request.url);
       const html: string | void = await _readFile(fname);
 
-      response.setHeader('content-type', 'text/html; charset=utf-8')
+      response.setHeader('content-type', 'text/html; charset=utf-8');
       response.end(html);
     }
   } catch (error) {
-    response.setHeader('content-type', 'application/json')
+    response.setHeader('content-type', 'application/json');
 
     if (_isNodeError(error) && error.code === 'ENOENT') {
       response.statusCode = 404;
@@ -41,10 +51,13 @@ server.on('request', async (request: http.IncomingMessage, response: http.Server
   }
 });
 
-server.listen(3500, (): void => console.log('server run at 3500 port'));
+server.listen(config.server.port, (): void => console.log(`server run at ${config.server.port} port`));
 
 function _readFile(fname: string): Promise<string | void> {
-  return new Promise((resolve: (value: string) => void, reject: (error: NodeJS.ErrnoException) => void): void => {
+  return new Promise((
+    resolve: (value: string) => void,
+    reject: (error: NodeJS.ErrnoException) => void,
+  ): void => {
     fs.readFile(_getFilePath(fname), (error: NodeJS.ErrnoException | null, buff: Buffer): void => {
       if (error) {
         reject(error);
@@ -59,19 +72,8 @@ function _readFile(fname: string): Promise<string | void> {
     });
 }
 
-// function _readFile(fname: string): Promise<string> {
-//   return fetch(`https://github.com/GeoS74/wiki/blob/main/${fname}`)
-//   .then(async (response) => {
-//     const foo = await response.text();
-//     console.log(response.status);
-//     console.log(`https://github.com/GeoS74/wiki/blob/main/${fname}`)
-//     return foo
-//   })
-//   .catch(error=> error.message)
-// }
-
 function _getFilePath(fname: string): string {
-  return path.join(__dirname, `../../../wiki/${fname}`);
+  return path.join(__dirname, `../${config.repository.path}/${fname}`);
 }
 
 function _getFileName(path: string): string {
@@ -79,11 +81,11 @@ function _getFileName(path: string): string {
 }
 
 function _isNodeError(error: unknown): error is NodeJS.ErrnoException {
-  return error instanceof Error
+  return error instanceof Error;
 }
 
 function _errorToJSON(message: string): string {
   return JSON.stringify({
-    error: message
-  })
+    error: message,
+  });
 }

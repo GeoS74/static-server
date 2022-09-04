@@ -25,5 +25,5 @@ module.exports = {
     'import/prefer-default-export': 'off',
   },
   plugins: ['@typescript-eslint'],
-  ignorePatterns: ['*.js', '/client/*'],
+  ignorePatterns: ['*.js', '/repo/*'],
 };

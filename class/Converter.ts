@@ -1,30 +1,32 @@
 // import * as os from 'os';
-import { IConverter } from "./IConverter";
+import { IConverter } from './IConverter';
 
 export class Converter implements IConverter {
   regexp = {
-    title: /^([-]\s+|\d[\)\.]\s+|\s*)(#+)(\s+)(.*)/, //ok
-    image: /!\[\[.+?\]\]/g, //ok
-    internalLink: /(^|[^!])(\[\[.+?\]\])/g, //ok
-    externalLink: /(\[[^[]*?\])(\(.+?\))/g, //ok
-    bold: /(__|\*\*)([^_\*].*?)\1/g, //ok
-    cursive: /(_|\*)([^_\*].*?)\1(\s|$)/g, //ok
-    longSpace: /\s+/g, //ok
+    title: /^([-]\s+|\d[\)\.]\s+|\s*)(#+)(\s+)(.*)/, // ok
+    image: /!\[\[.+?\]\]/g, // ok
+    internalLink: /(^|[^!])(\[\[.+?\]\])/g, // ok
+    externalLink: /(\[[^[]*?\])(\(.+?\))/g, // ok
+    bold: /(__|\*\*)([^_\*].*?)\1/g, // ok
+    cursive: /(_|\*)([^_\*].*?)\1(\s|$)/g, // ok
+    longSpace: /\s+/g, // ok
     ul: /^-\s+(.*)/,
     ol: /^(\d)[\.\)]\s+(.*)/,
     code: /^\s*?```|\n\s*?```\s*?/,
     shortcode: /`(.*?)`/g,
-    paragraph: /^\s*#?([\w\dа-яА-Я]|<[bia][\s>]|<small>|<code>)/, //ok
+    paragraph: /^\s*#?([\w\dа-яА-Я]|<[bia][\s>]|<small>|<code>)/, // ok
     blockquote: /^\s*>\s*(.*)/,
     hashtag: /#([\w\dа-яА-Я]+)/g,
     ecsapetag: /<(Buffer.*?)>/g,
   };
-  codeBlock: boolean = false;
+
+  codeBlock = false;
+
   tag: {
     type?: string,
     open?: string,
     close?: string,
-  } = {}
+  } = {};
 
   private setTag(tag?: string, start?: number): void {
     switch (tag) {
@@ -33,24 +35,24 @@ export class Converter implements IConverter {
           type: 'ul',
           open: '<ul>',
           close: '</li></ul>',
-        }
+        };
         break;
       case 'ol':
         this.tag = {
           type: 'ol',
           open: `<ol start="${start || 1}">`,
           close: '</li></ol>',
-        }
+        };
         break;
       case 'blockquote':
         this.tag = {
           type: 'blockquote',
           open: '<blockquote>',
           close: '</p></blockquote>',
-        }
+        };
         break;
       default:
-        this.tag = {}
+        this.tag = {};
     }
   }
 
@@ -60,10 +62,10 @@ export class Converter implements IConverter {
     return markdown
       .split('\n')
       .map((line: string): string => this.linePipe(line))
-      .join(`\n`)
+      .join('\n')
       .split(this.regexp.code)
-      .map((block: string, i: number): string => (i % 2) ? this.code(block) : block)
-      .join(`\n`) + (this.tag.close || '');
+      .map((block: string, i: number): string => ((i % 2) ? this.code(block) : block))
+      .join('\n') + (this.tag.close || '');
   }
 
   private list(line: string): string {
@@ -92,7 +94,6 @@ export class Converter implements IConverter {
     return line;
   }
 
-
   private code(block: string): string {
     const iterator: IterableIterator<RegExpMatchArray> = block.matchAll(this.regexp.ecsapetag);
     const matched: RegExpMatchArray[] = [...iterator];
@@ -102,7 +103,7 @@ export class Converter implements IConverter {
         block = block.replace(chunk[0], chunk[1]);
       }
     }
-    return `<pre><code>${block}</code></pre>`
+    return `<pre><code>${block}</code></pre>`;
   }
 
   private paragraph(line: string): string {
@@ -173,9 +174,9 @@ export class Converter implements IConverter {
   }
 
   private blockquote(line: string): string {
-    let matched: RegExpMatchArray | null = line.match(this.regexp.blockquote);
+    const matched: RegExpMatchArray | null = line.match(this.regexp.blockquote);
     if (matched) {
-      if(!matched[1].trim()) {
+      if (!matched[1].trim()) {
         return '';
       }
       if (this.tag.type !== 'blockquote') {

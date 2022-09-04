@@ -1,7 +1,10 @@
 #!/bin/bash
-if [ -d ./repo ]
+# $1 - url repository
+# $2 - local path to repository folder
+if [ -d $2 ]
 then
-git pull https://github.com/GeoS74/wiki.git
+cd $2
+git pull $1
 else
-git clone https://github.com/GeoS74/wiki.git repo
+git clone $1 $2
 fi
