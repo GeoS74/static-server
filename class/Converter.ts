@@ -58,7 +58,7 @@ export class Converter implements IConverter {
 
   markdownToHTML(markdown: string): string {
     this.codeBlock = false;
-    this.tag = {};
+    this.setTag();
     return markdown
       .split('\n')
       .map((line: string): string => this.linePipe(line))

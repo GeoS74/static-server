@@ -33,16 +33,25 @@ server.on('request', async (request: http.IncomingMessage, response: http.Server
   try {
     if (request.method !== 'GET') {
       response.statusCode = 404;
-      response.end('not found');
-      return;
+      throw new Error('not found')
     }
 
     if (request?.url) {
       const fname: string = _getFileName(request.url);
-      const html: string | void = await _readFile(fname);
 
-      response.setHeader('content-type', 'text/html; charset=utf-8');
-      response.end(html);
+      if (_isRequestPage(request?.headers?.accept)) {
+        response.setHeader('content-type', 'text/html; charset=utf-8');
+        
+        const buff: Buffer | void = await _readFile(`${fname}.md`);
+        if (buff) {
+          response.end(converter.markdownToHTML(buff.toString()))
+          return;
+        }
+        throw new Error('file not found');
+      }
+
+      const buff: Buffer | void = await _readFile(fname);
+      response.end(buff);
     }
   } catch (error) {
     response.setHeader('content-type', 'application/json');
@@ -54,6 +63,10 @@ server.on('request', async (request: http.IncomingMessage, response: http.Server
     }
 
     if (error instanceof Error) {
+      if (response.statusCode) {
+        response.end(_errorToJSON(error.message));
+        return;
+      }
       console.log(error.message);
     }
     response.statusCode = 500;
@@ -63,9 +76,9 @@ server.on('request', async (request: http.IncomingMessage, response: http.Server
 
 server.listen(config.server.port, (): void => console.log(`server run at ${config.server.port} port`));
 
-function _readFile(fname: string): Promise<string | void> {
+function _readFile(fname: string): Promise<Buffer | void> {
   return new Promise((
-    resolve: (value: string) => void,
+    resolve: (buff: Buffer) => void,
     reject: (error: NodeJS.ErrnoException) => void,
   ): void => {
     fs.readFile(_getFilePath(fname), (error: NodeJS.ErrnoException | null, buff: Buffer): void => {
@@ -73,13 +86,16 @@ function _readFile(fname: string): Promise<string | void> {
         reject(error);
         return;
       }
-      resolve(buff.toString());
+      resolve(buff);
     });
   })
-    .then((markdown: string): string => converter.markdownToHTML(markdown))
     .catch((error: NodeJS.ErrnoException): void => {
       throw error;
     });
+}
+
+function _isRequestPage(accept: string | undefined): boolean {
+  return (accept && /^text/.test(accept)) ? true : false;
 }
 
 function _getFilePath(fname: string): string {
@@ -87,7 +103,7 @@ function _getFilePath(fname: string): string {
 }
 
 function _getFileName(path: string): string {
-  return `${decodeURI(path).split('/')[1] || 'main'}.md`;
+  return `${decodeURI(path).split('/')[1] || 'main'}`;
 }
 
 function _isNodeError(error: unknown): error is NodeJS.ErrnoException {
