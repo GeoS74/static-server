@@ -1,6 +1,7 @@
 import * as http from 'http';
 import * as path from 'path';
 import * as fs from 'fs';
+import {EOL} from 'os';
 
 import { execFile } from 'node:child_process';
 import { ExecFileException } from 'child_process';
@@ -10,14 +11,18 @@ import { Converter } from './class/Converter';
 const server: http.Server = http.createServer();
 const converter: Converter = new Converter();
 
+const pathScript = EOL === '\r\n' ? '../util/sync.bat' : '../util/sync';
 (function sync(): void {
-  execFile('./sync', [config.repository.url, config.repository.path], (error: ExecFileException | null, stdout: string, stderr: string): string | void => {
-    if (error) {
-      console.log(`error sync: ${error.message}`);
-    }
-    setTimeout((): void => sync(), config.repository.syncDelay);
-  });
-}());
+  execFile(
+    path.join(__dirname, pathScript),
+    [config.repository.url, path.join(__dirname, '../', config.repository.path)],
+    (error: ExecFileException | null, stdout: string, stderr: string): string | void => {
+      if (error) {
+        console.log(`error sync: ${error.message}`);
+      }
+      setTimeout((): void => sync(), config.repository.syncDelay);
+    });
+})();
 
 server.on('request', async (request: http.IncomingMessage, response: http.ServerResponse): Promise<void> => {
   try {
