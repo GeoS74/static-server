@@ -1,18 +1,23 @@
 import * as http from 'http';
 import * as path from 'path';
 import * as fs from 'fs';
-import {EOL} from 'os';
 
-import { execFile } from 'node:child_process';
-import { ExecFileException } from 'child_process';
+import { execFile, ExecFileException } from 'node:child_process';
 import { config } from './config';
 import { Converter } from './class/Converter';
 
 const server: http.Server = http.createServer();
 const converter: Converter = new Converter();
 
-const pathScript = EOL === '\r\n' ? '../util/sync.bat' : '../util/sync';
-(function sync(): void {
+switch(process.platform){
+  case 'win32': sync('../util/sync.bat'); break;
+  case 'linux': sync('../util/sync'); break;
+  default: 
+    console.log(`platform ${process.platform} not supported`);
+    process.exit();
+}
+
+function sync(pathScript: string): void {
   execFile(
     path.join(__dirname, pathScript),
     [config.repository.url, path.join(__dirname, '../', config.repository.path)],
@@ -20,9 +25,9 @@ const pathScript = EOL === '\r\n' ? '../util/sync.bat' : '../util/sync';
       if (error) {
         console.log(`error sync: ${error.message}`);
       }
-      setTimeout((): void => sync(), config.repository.syncDelay);
+      setTimeout((): void => sync(pathScript), config.repository.syncDelay);
     });
-})();
+}
 
 server.on('request', async (request: http.IncomingMessage, response: http.ServerResponse): Promise<void> => {
   try {
