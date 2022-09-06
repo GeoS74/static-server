@@ -2,7 +2,7 @@
 import { IConverter } from './IConverter';
 
 export class Converter implements IConverter {
-  regexp = {
+  private regexp = {
     title: /^([-]\s+|\d[\)\.]\s+|\s*)(#+)(\s+)(.*)/, // ok
     image: /!\[\[.+?\]\]/g, // ok
     internalLink: /(^|[^!])(\[\[.+?\]\])/g, // ok
@@ -20,13 +20,25 @@ export class Converter implements IConverter {
     ecsapetag: /<(Buffer.*?)>/g,
   };
 
-  codeBlock = false;
+  private codeBlock = false;
 
-  tag: {
+  private tag: {
     type?: string,
     open?: string,
     close?: string,
   } = {};
+
+  markdownToHTML(markdown: string): string {
+    this.codeBlock = false;
+    this.setTag();
+    return markdown
+      .split('\n')
+      .map((line: string): string => this.linePipe(line))
+      .join('\n')
+      .split(this.regexp.code)
+      .map((block: string, i: number): string => ((i % 2) ? this.code(block) : block))
+      .join('\n') + (this.tag.close || '');
+  }
 
   private setTag(tag?: string, start?: number): void {
     switch (tag) {
@@ -55,19 +67,7 @@ export class Converter implements IConverter {
         this.tag = {};
     }
   }
-
-  markdownToHTML(markdown: string): string {
-    this.codeBlock = false;
-    this.setTag();
-    return markdown
-      .split('\n')
-      .map((line: string): string => this.linePipe(line))
-      .join('\n')
-      .split(this.regexp.code)
-      .map((block: string, i: number): string => ((i % 2) ? this.code(block) : block))
-      .join('\n') + (this.tag.close || '');
-  }
-
+  
   private list(line: string): string {
     let matched: RegExpMatchArray | null = line.match(this.regexp.ul);
     if (matched) {
@@ -130,9 +130,11 @@ export class Converter implements IConverter {
       this.setTag();
       return line;
     }
-
+    console.log(line)
     line = this.internalLink(line);
+    console.log(line)
     line = this.externalLink(line);
+    console.log(line)
     line = this.title(line);
     line = this.bold(line);
     line = this.cursive(line);
