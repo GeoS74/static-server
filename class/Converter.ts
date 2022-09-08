@@ -130,11 +130,8 @@ export class Converter implements IConverter {
       this.setTag();
       return line;
     }
-    console.log(line)
     line = this.internalLink(line);
-    console.log(line)
     line = this.externalLink(line);
-    console.log(line)
     line = this.title(line);
     line = this.bold(line);
     line = this.cursive(line);
@@ -295,9 +292,6 @@ export class Converter implements IConverter {
     if (!matched) {
       return line;
     }
-    // console.log(line)
-    // console.log(this.regexp.longSpace.test(matched[1]))
-    // console.log(matched[1])
     return `${matched[1]}<h${matched[2].length}>${matched[4]}</h${matched[2].length}>`;
   }
 
