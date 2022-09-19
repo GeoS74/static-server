@@ -1,17 +1,16 @@
-// import * as os from 'os';
 import { IConverter } from './IConverter';
 
 export class Converter implements IConverter {
   private regexp = {
-    title: /^([-]\s+|\d[\)\.]\s+|\s*)(#+)(\s+)(.*)/, // ok
+    title: /^([-]\s+|\d[).]\s+|\s*)(#+)(\s+)(.*)/, // ok
     image: /!\[\[.+?\]\]/g, // ok
     internalLink: /(^|[^!])(\[\[.+?\]\])/g, // ok
     externalLink: /(\[[^[]*?\])(\(.+?\))/g, // ok
-    bold: /(__|\*\*)([^_\*].*?)\1/g, // ok
-    cursive: /(_|\*)([^_\*].*?)\1(\s|$)/g, // ok
+    bold: /(__|\*\*)([^_*].*?)\1/g, // ok
+    cursive: /(_|\*)([^_*].*?)\1(\s|$)/g, // ok
     longSpace: /\s+/g, // ok
     ul: /^-\s+(.*)/,
-    ol: /^(\d)[\.\)]\s+(.*)/,
+    ol: /^(\d)[.)]\s+(.*)/,
     code: /^\s*?```|\n\s*?```\s*?/,
     shortcode: /`(.*?)`/g,
     paragraph: /^\s*#?([\w\dа-яА-Я]|<[bia][\s>]|<small>|<code>)/, // ok
@@ -67,7 +66,7 @@ export class Converter implements IConverter {
         this.tag = {};
     }
   }
-  
+
   private list(line: string): string {
     let matched: RegExpMatchArray | null = line.match(this.regexp.ul);
     if (matched) {
@@ -84,7 +83,7 @@ export class Converter implements IConverter {
     if (matched) {
       if (this.tag.type !== 'ol') {
         let tags: string = this.tag.close || '';
-        this.setTag('ol', Number.parseInt(matched[1]));
+        this.setTag('ol', Number.parseInt(matched[1], 10));
         tags += this.tag.open;
         return `${tags}<li>${matched[2]}`;
       }
