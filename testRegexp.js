@@ -58,6 +58,10 @@ res = [...str.matchAll(regexp.list)]
 
 
 ////////////////////////////////////////////////////image
+// str = '![[hello100]] and ![[world]] is my';
+// res = [...str.matchAll(regexp.image)]
+// console.log(res);
+
 str = '![[hello]] and ![[world]] is my';
 res = [...str.matchAll(regexp.image)]
 // console.log(res);

@@ -238,9 +238,9 @@ export class Converter implements IConverter {
         .split('|');
 
       const url: string = link[0].trim();
-      const alias: string = link.length > 1 ? link.slice(1).join('|').trim() : url;
+      const alias: number = link.length > 1 ? Number.parseInt(link.slice(1).join('|')) : 0;
 
-      line = line.replace(chunk[0], `<img src="/${url}" alt="${alias}"/>`);
+      line = line.replace(chunk[0], `<img src="/${url}" width="${alias ? alias+'px' : '100%'}" />`);
     }
     return line;
   }
