@@ -9,10 +9,10 @@ import { Converter } from './class/Converter';
 const server: http.Server = http.createServer();
 const converter: Converter = new Converter();
 
-switch(process.platform){
+switch (process.platform) {
   case 'win32': sync('../util/sync.bat'); break;
   case 'linux': sync('../util/sync'); break;
-  default: 
+  default:
     console.log(`platform ${process.platform} not supported`);
     process.exit();
 }
@@ -26,14 +26,15 @@ function sync(pathScript: string): void {
         console.log(`error sync: ${error.message}`);
       }
       setTimeout((): void => sync(pathScript), config.repository.syncDelay);
-    });
+    },
+  );
 }
 
 server.on('request', async (request: http.IncomingMessage, response: http.ServerResponse): Promise<void> => {
   try {
     if (request.method !== 'GET') {
       response.statusCode = 404;
-      throw new Error('not found')
+      throw new Error('not found');
     }
 
     if (request?.url) {
@@ -41,10 +42,10 @@ server.on('request', async (request: http.IncomingMessage, response: http.Server
 
       if (_isRequestPage(request?.headers?.accept)) {
         response.setHeader('content-type', 'text/html; charset=utf-8');
-        
+
         const buff: Buffer | void = await _readFile(`${fname}.md`);
         if (buff) {
-          response.end(converter.markdownToHTML(buff.toString()))
+          response.end(converter.markdownToHTML(buff.toString()));
           return;
         }
         throw new Error('file not found');
@@ -95,7 +96,7 @@ function _readFile(fname: string): Promise<Buffer | void> {
 }
 
 function _isRequestPage(accept: string | undefined): boolean {
-  return (accept && /^text/.test(accept)) ? true : false;
+  return !!((accept && /^text/.test(accept)));
 }
 
 function _getFilePath(fname: string): string {

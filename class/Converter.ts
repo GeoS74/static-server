@@ -240,7 +240,7 @@ export class Converter implements IConverter {
       const url: string = link[0].trim();
       const alias: number = link.length > 1 ? Number.parseInt(link.slice(1).join('|')) : 0;
 
-      line = line.replace(chunk[0], `<img src="/${url}" width="${alias ? alias+'px' : '100%'}" />`);
+      line = line.replace(chunk[0], `<img src="/${url}" width="${alias ? `${alias}px` : '100%'}" />`);
     }
     return line;
   }
