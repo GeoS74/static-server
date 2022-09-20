@@ -238,7 +238,7 @@ export class Converter implements IConverter {
         .split('|');
 
       const url: string = link[0].trim();
-      const alias: number = link.length > 1 ? Number.parseInt(link.slice(1).join('|')) : 0;
+      const alias: number = link.length > 1 ? Number.parseInt(link.slice(1).join('|'), 10) : 0;
 
       line = line.replace(chunk[0], `<img src="/${url}" width="${alias ? `${alias}px` : '100%'}" />`);
     }
@@ -277,7 +277,7 @@ export class Converter implements IConverter {
 
     for (const chunk of matched) {
       const alias: string = chunk[1].slice(1, -1).trim();
-      const url: string | null = this.getUrl(chunk[2].slice(1, -1).trim());
+      const url: string | null = Converter.getUrl(chunk[2].slice(1, -1).trim());
 
       const newLink = url ? `<a href="${url}" target="blank">${alias}</a>` : `[${alias}]${chunk[2]}`;
       line = line.replace(chunk[0], newLink);
@@ -294,7 +294,7 @@ export class Converter implements IConverter {
     return `${matched[1]}<h${matched[2].length}>${matched[4]}</h${matched[2].length}>`;
   }
 
-  private getUrl(url: string): string | null {
+  private static getUrl(url: string): string | null {
     try {
       return new URL(url).href;
     } catch (error) {

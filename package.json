@@ -4,22 +4,26 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "test": "echo 'test not implemented'",
+    "build": "tsc",
+    "lint": "eslint ./src",
+    "lint:fix": "eslint ./src --fix"
   },
   "keywords": [
     "obsidian"
   ],
   "author": "GeoS",
   "license": "ISC",
-  "type": "commonjs",
   "devDependencies": {
     "@types/node": "^18.7.3",
-    "@typescript-eslint/eslint-plugin": "^5.33.0",
-    "@typescript-eslint/parser": "^5.33.0",
-    "eslint": "^8.22.0",
+    "@typescript-eslint/eslint-plugin": "^5.38.0",
+    "@typescript-eslint/parser": "^5.38.0",
+    "eslint": "^8.23.1",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
     "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "log4js": "^6.6.1"
   }
 }

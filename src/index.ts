@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import { execFile, ExecFileException } from 'node:child_process';
 import { config } from './config';
 import { Converter } from './class/Converter';
+import { logger } from './libs/logger';
 
 const server: http.Server = http.createServer();
 const converter: Converter = new Converter();
@@ -13,7 +14,7 @@ switch (process.platform) {
   case 'win32': sync('../util/sync.bat'); break;
   case 'linux': sync('../util/sync'); break;
   default:
-    console.log(`platform ${process.platform} not supported`);
+    logger.error(`platform ${process.platform} not supported`);
     process.exit();
 }
 
@@ -21,9 +22,9 @@ function sync(pathScript: string): void {
   execFile(
     path.join(__dirname, pathScript),
     [config.repository.url, path.join(__dirname, '../', config.repository.path)],
-    (error: ExecFileException | null, stdout: string, stderr: string): string | void => {
+    (error: ExecFileException | null /* , stdout: string, stderr: string */): string | void => {
       if (error) {
-        console.log(`error sync: ${error.message}`);
+        logger.error(`error sync: ${error.message}`);
       }
       setTimeout((): void => sync(pathScript), config.repository.syncDelay);
     },
@@ -68,14 +69,14 @@ server.on('request', async (request: http.IncomingMessage, response: http.Server
         response.end(_errorToJSON(error.message));
         return;
       }
-      console.log(error.message);
+      logger.error(error.message);
     }
     response.statusCode = 500;
     response.end(_errorToJSON('internal server error'));
   }
 });
 
-server.listen(config.server.port, (): void => console.log(`server run at ${config.server.port} port`));
+server.listen(config.server.port, (): void => logger.info(`server run at ${config.server.port} port`));
 
 function _readFile(fname: string): Promise<Buffer | void> {
   return new Promise((
