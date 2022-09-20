@@ -17,6 +17,7 @@ module.exports = {
     plugins: [
         "@typescript-eslint"
     ],
+    ignorePatterns: ['*.js'],
     rules: {
       "@typescript-eslint/no-use-before-define": "off",
       "@typescript-eslint/naming-convention": "off",
