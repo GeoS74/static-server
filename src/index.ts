@@ -4,8 +4,9 @@ import * as fs from 'fs';
 
 import { execFile, ExecFileException } from 'node:child_process';
 import { config } from './config';
-import { Converter } from './class/Converter';
 import { logger } from './libs/logger';
+// import { Converter } from './class/Converter';
+import {Converter} from 'md-conv';
 
 const server: http.Server = http.createServer();
 const converter: Converter = new Converter();
