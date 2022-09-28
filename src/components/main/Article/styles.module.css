@@ -1,0 +1,23 @@
+.root {
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(255, 255, 255);
+}
+
+h1 {
+    color: red;
+    margin: 5px 0 5px 5px;
+}
+
+/* h3 {
+    margin: 15px;
+} */
+
+li { 
+    list-style-type: none;
+    margin: 5px;
+}
+
+a {
+    text-decoration: none;
+} 
