@@ -3,10 +3,10 @@ import react from "react";
 import { ButtonRequestGit } from "../ButtonRequestGit/ButtonRequestGit";
 import styles from "./styles.module.css";
 
-export const RootHeader = ({ setpage_markup }) => {
+export const RootHeader = () => {
     return (
         <div className={classNames(styles.root)}>
-            <ButtonRequestGit setpage_markup={setpage_markup} />
+            <ButtonRequestGit />
         </div>
     );
 };

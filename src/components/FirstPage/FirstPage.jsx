@@ -16,8 +16,6 @@ function dbReuestsFromServer(setpage_markup) {
         if (req.ok) {
             let page_data = await req.text();
             setpage_markup(page_data);
-
-            console.log(page_data);
         } else {
             console.log(req.status);
         }
@@ -25,15 +23,11 @@ function dbReuestsFromServer(setpage_markup) {
 }
 
 export const FirstPage = () => {
-    const [page_markup, setpage_markup] = useState(dbReuestsFromServer(setpage_markup));
-    if (useState === "") {
-        dbReuestsFromServer(setpage_markup);
-    }
-    console.log(123);
+    const [page_markup, setpage_markup] = useState("");
     return (
         <div className={classNames(styles.root)}>
-            <RootHeader setpage_markup={setpage_markup} />
-            <RootMain page_markup={page_markup} />
+            <RootHeader />
+            <RootMain page_markup={page_markup || dbReuestsFromServer(setpage_markup)} />
             <RootFooter />
         </div>
     );
