@@ -3,5 +3,9 @@ import styles from "./styles.module.css";
 import classNames from "classnames";
 
 export const ButtonRequestGit = () => {
-    return <button className={classNames(styles.button)}>На главную</button>;
+    return (
+        <button className={"btn btn-warning"} onClick={() => (window.location = "/")}>
+            На главную
+        </button>
+    );
 };
