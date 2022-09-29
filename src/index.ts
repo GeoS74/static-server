@@ -3,10 +3,10 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import { execFile, ExecFileException } from 'node:child_process';
-import { config } from './config';
-import { logger } from './libs/logger';
 // import { Converter } from './class/Converter';
-import {Converter} from 'md-conv';
+import { Converter } from 'md-conv';
+import { logger } from './libs/logger';
+import { config } from './config';
 
 const server: http.Server = http.createServer();
 const converter: Converter = new Converter();
@@ -33,6 +33,7 @@ function sync(pathScript: string): void {
 }
 
 server.on('request', async (request: http.IncomingMessage, response: http.ServerResponse): Promise<void> => {
+  response.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
   try {
     if (request.method !== 'GET') {
       response.statusCode = 404;
@@ -40,6 +41,20 @@ server.on('request', async (request: http.IncomingMessage, response: http.Server
     }
 
     if (request?.url) {
+      if (request.url === '/api/files') {
+        response.setHeader('content-type', 'application/json');
+
+        let pages = {};
+        const mdDir: string[] | void = await _readDir(_getFilePath(''));
+
+        if (mdDir) {
+          const mdTitles: string[] = _filteredFiles(mdDir);
+          pages = _pageMapper(mdTitles);
+        }
+        response.end(JSON.stringify(pages));
+        return;
+      }
+
       const fname: string = _getFileName(request.url);
 
       if (_isRequestPage(request?.headers?.accept)) {
@@ -52,7 +67,6 @@ server.on('request', async (request: http.IncomingMessage, response: http.Server
         }
         throw new Error('file not found');
       }
-
       const buff: Buffer | void = await _readFile(fname);
       response.end(buff);
     }
@@ -78,6 +92,35 @@ server.on('request', async (request: http.IncomingMessage, response: http.Server
 });
 
 server.listen(config.server.port, (): void => logger.info(`server run at ${config.server.port} port`));
+
+function _readDir(path: string): Promise<string[] | void> {
+  return new Promise((
+    resolve: (files: string[]) => void,
+    reject: (error: NodeJS.ErrnoException) => void,
+  ): void => {
+    fs.readdir(path, (error: NodeJS.ErrnoException | null, files: string[]): void => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve(files);
+    });
+  })
+    .catch((error: NodeJS.ErrnoException): void => {
+      throw error;
+    });
+}
+
+function _filteredFiles(files: string[]): string[] {
+  return files.filter((fname: string): boolean => /\.md$/.test(fname));
+}
+
+function _pageMapper(mdFilesNames: string[]) {
+  return mdFilesNames.map((mdFileName: string) => ({
+    fname: mdFileName,
+    title: mdFileName.slice(0, -3),
+  }));
+}
 
 function _readFile(fname: string): Promise<Buffer | void> {
   return new Promise((
