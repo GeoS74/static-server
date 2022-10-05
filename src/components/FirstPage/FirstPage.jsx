@@ -26,7 +26,9 @@ function dbSearchRequestsServer() {
     fetch(`http://localhost:3500/api/files`).then(async (sear) => {
         if (sear.ok) {
             let search_data = await sear.json();
-            console.log(search_data);
+            for (let i in search_data) {
+                sessionStorage.setItem(`${search_data[i]["fname"]}`, `${search_data[i]["title"]}`);
+            }
         } else {
             console.log(sear.status);
         }
@@ -35,7 +37,12 @@ function dbSearchRequestsServer() {
 
 export const FirstPage = () => {
     const [page_markup, setpage_markup] = useState("");
-    dbSearchRequestsServer();
+    if (sessionStorage.key[0] === null || sessionStorage.key[0] === undefined) {
+        dbSearchRequestsServer();
+    } else {
+        console.log(sessionStorage.key[0]);
+    }
+
     return (
         <div className={classNames(styles.root)}>
             <RootHeader />
