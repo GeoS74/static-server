@@ -6,8 +6,8 @@ import { RootFooter } from "../footer/RootFooter/RootFooter";
 import { RootHeader } from "../header/RootHeader/RootHeader";
 import { RootMain } from "../main/RootMain/RootMain";
 
-function dbRequestsFromServer(setpage_markup) {
-    const pathUrl = document.location.pathname;
+function dbRequestsFromServer(setpage_markup, searchPathUrl = null) {
+    const pathUrl = searchPathUrl === null ? document.location.pathname : searchPathUrl;
     fetch(`http://localhost:3500${pathUrl}`, {
         headers: {
             accept: "text/html",
@@ -24,15 +24,10 @@ function dbRequestsFromServer(setpage_markup) {
 
 export const FirstPage = () => {
     const [page_markup, setpage_markup] = useState("");
-    // if (sessionStorage.key[0] === null || sessionStorage.key[0] === undefined) {
-    //     dbSearchRequestsServer();
-    // } else {
-    //     console.log(sessionStorage.key[0]);
-    // }
 
     return (
         <div className={classNames(styles.root)}>
-            <RootHeader />
+            <RootHeader setpage_markup={setpage_markup} dbRequestsFromServer={dbRequestsFromServer} />
             <RootMain page_markup={page_markup || dbRequestsFromServer(setpage_markup)} />
             <RootFooter />
         </div>

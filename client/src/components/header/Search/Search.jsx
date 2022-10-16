@@ -5,7 +5,7 @@ import { useState } from "react";
 import { DropDownList } from "../DropDownList/DropDownList";
 import { useEffect } from "react";
 
-export const Search = () => {
+export const Search = ({ setpage_markup, dbRequestsFromServer }) => {
     // получение json с сервера и записываем его в hook searchHook
     const [searchHook, setSearchHook] = useState([]);
     const dbSearchRequestsServer = () => {
@@ -32,7 +32,7 @@ export const Search = () => {
     const searchClickHendler = (e) => {
         setValue(e.target.textContent);
         setIsOpen(!isOpen);
-        console.log(value);
+        dbRequestsFromServer(setpage_markup, `/${e.target.textContent}`);
     };
 
     const inputClickHendler = () => {
@@ -48,7 +48,9 @@ export const Search = () => {
                         placeholder="Поиск"
                         className={classNames(styles.search_input)}
                         value={value}
-                        onInput={(event) => setValue(event.target.value)}
+                        onChange={(event) => {
+                            setValue(event.target.value);
+                        }}
                         onClick={inputClickHendler}
                     />
                     <ul className={classNames(styles.autocomplite)}>
@@ -70,15 +72,4 @@ export const Search = () => {
             </div>
         </div>
     );
-
-    // return (
-    //     <p>
-    //         <input onInput={searchInput} list="asd" autoComplete="off" placeholder="Поиск по меткам" onChange={(event) => console.log(event.target.value)}></input>
-    //         <datalist id="asd">
-    //             {searchHook.map((strResult) => (
-    //                 <DropDownList valueStrSearch={strResult} />
-    //             ))}
-    //         </datalist>
-    //     </p>
-    // );
 };
