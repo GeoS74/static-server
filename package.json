@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo 'test not implemented'",
-    "build": "tsc",
+    "build": "npx tsc",
     "lint": "eslint ./src",
     "lint:fix": "eslint ./src --fix"
   },
