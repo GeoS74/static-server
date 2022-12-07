@@ -1,6 +1,6 @@
 :: %1 - url repository
 :: %2 - local path to repository folder
-if exist %2 (
+if exist "%2/.git" (
   cd %2
   git pull
 ) else (

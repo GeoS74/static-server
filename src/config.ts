@@ -5,7 +5,7 @@ export const config = {
   },
   repository: {
     url: 'https://github.com/GeoS74/wiki.git',
-    path: '/repo',
-    syncDelay: 1000 * 60 * 60,
+    path: process.env.REPO_PATH || '/repo',
+    syncDelay: process.env.SYNC_MSTIME || 1000 * 60 * 60,
   },
 };

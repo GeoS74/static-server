@@ -27,7 +27,7 @@ function sync(pathScript: string): void {
       if (error) {
         logger.error(`error sync: ${error.message}`);
       }
-      setTimeout((): void => sync(pathScript), config.repository.syncDelay);
+      setTimeout((): void => sync(pathScript), +config.repository.syncDelay);
     },
   );
 }
